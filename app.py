@@ -84,6 +84,7 @@ class Order(db.Model):
     status = db.Column(db.String(50))
 
     amount = db.Column(db.Float, default=0)
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 
