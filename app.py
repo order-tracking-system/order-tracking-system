@@ -288,8 +288,6 @@ def update_status(id, status):
     db.session.commit()
 
     return redirect(f'/order/{id}')
-
-
 @app.route('/search')
 def search():
 
@@ -418,7 +416,6 @@ def reports():
         month=month,
         year=year
     )
-
 @app.route('/track/<order_no>')
 def track(order_no):
 
