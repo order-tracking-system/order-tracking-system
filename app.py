@@ -20,13 +20,21 @@ if DATABASE_URL:
     )
 
 app.config["SQLALCHEMY_DATABASE_URI"] = (
-    DATABASE_URL or "sqlite:///database.db"
+    DATABASE_URL or "sqlite:///" + os.path.join(
+        app.root_path,
+        "database.db"
+    )
+)
+app.config["SQLALCHEMY_DATABASE_URI"] = (
+    DATABASE_URL or "sqlite:///" + os.path.join(
+        app.root_path,
+        "database.db"
+    )
 )
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
-
 
 class Customer(db.Model):
 
@@ -66,8 +74,6 @@ class Order(db.Model):
     staff_name = db.Column(db.String(100))
 
     remarks = db.Column(db.Text)
-
-    order_date = db.Column(db.String(50))
 
     order_date = db.Column(db.Date)
 
