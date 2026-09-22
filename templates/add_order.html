@@ -118,10 +118,22 @@
                 </div>
 
                 <!-- Staff -->
-                <div class="col-md-6 mb-3">
-                    <label>Order By (Staff Name)</label>
-                    <input class="form-control" name="staff_name">
-                </div>
+               <!-- Assign Designer -->
+<div class="col-md-6 mb-3">
+    <label>Assign Designer</label>
+
+    <select class="form-control" name="staff_name" required>
+
+        <option value="">Select Designer</option>
+
+        {% for designer in designers %}
+            <option value="{{ designer.username }}">
+                {{ designer.name }}
+            </option>
+        {% endfor %}
+
+    </select>
+</div>
 
                 <div class="col-md-6 mb-3">
                     <label>Order Date</label>

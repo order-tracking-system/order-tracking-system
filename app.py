@@ -45,7 +45,17 @@ class Customer(db.Model):
     mobile = db.Column(db.String(20), unique=True)
 
     password = db.Column(db.String(100))
+class User(db.Model):
 
+    id = db.Column(db.Integer, primary_key=True)
+
+    name = db.Column(db.String(100), nullable=False)
+
+    username = db.Column(db.String(100), unique=True, nullable=False)
+
+    password = db.Column(db.String(100), nullable=False)
+
+    role = db.Column(db.String(50), nullable=False)
 
 class Order(db.Model):
 
@@ -99,8 +109,17 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        if username == "pingax" and password == "pingax@123":
-            session['user'] = username
+        user = User.query.filter_by(
+            username=username,
+            password=password
+        ).first()
+
+        if user:
+
+            session['user_id'] = user.id
+            session['user'] = user.username
+            session['role'] = user.role
+
             return redirect('/dashboard')
 
         return render_template(
@@ -160,11 +179,18 @@ def home():
 
 @app.route('/add', methods=['GET', 'POST'])
 def add_order():
-    if 'user' not in session:
+
+    if 'user_id' not in session:
         return redirect('/login')
 
+    designers = User.query.filter_by(
+        role='designer'
+    ).all()
+
     if request.method == 'POST':
+
         order_no = "ORD" + str(Order.query.count() + 1)
+
         order = Order(
             order_no=order_no,
             client_name=request.form['client_name'],
@@ -172,53 +198,108 @@ def add_order():
             product=request.form['product'],
             size=request.form['size'],
             quantity=int(request.form['quantity'] or 0),
+
             inside_process=request.form['inside_process'],
-            inside_gsm=request.form['inside_gsm'], # Matches HTML name
+            inside_gsm=request.form['inside_gsm'],
             inside_color=request.form['inside_color'],
+
             outside_process=request.form['outside_process'],
-            outside_gsm=request.form['outside_gsm'], # Matches HTML name
+            outside_gsm=request.form['outside_gsm'],
             outside_color=request.form['outside_color'],
+
             staff_name=request.form['staff_name'],
+
             remarks=request.form['remarks'],
+
             order_date=datetime.strptime(
-    request.form['order_date'],
-    "%Y-%m-%d"
-).date(),
+                request.form['order_date'],
+                "%Y-%m-%d"
+            ).date(),
+
             delivery_date=request.form['delivery_date'],
+
             status='Design',
+
             amount=0
         )
 
         db.session.add(order)
         db.session.commit()
+
         return redirect('/dashboard')
 
-    return render_template('add_order.html')
-
+    return render_template(
+        'add_order.html',
+        designers=designers
+    )
 @app.route('/dashboard')
 def dashboard():
 
-    if 'user' not in session:
+    if 'user_id' not in session:
         return redirect('/login')
 
-    orders = Order.query.all()
+    role = session.get('role')
+    username = session.get('user')
 
-    total_orders = Order.query.count()
+    # OWNER
+    if role == 'owner':
+        orders = Order.query.all()
 
-    design = Order.query.filter_by(status="Design").count()
+    # DESIGNER - ONLY THEIR ORDERS
+    elif role == 'designer':
+        orders = Order.query.filter_by(
+            staff_name=username
+        ).all()
 
-    jobcard = Order.query.filter_by(status="Job Card").count()
+    # OTHER STAFF
+    else:
+        orders = []
 
-    printing = Order.query.filter_by(status="Printing").count()
+    total_orders = len(orders)
 
-    packing = Order.query.filter_by(status="Packing").count()
-
-    dispatched = Order.query.filter_by(status="Dispatched").count()
-
-    total_revenue = sum(
-        float(order.amount or 0)
-        for order in orders
+    design = sum(
+        1 for order in orders
+        if order.status == "Design"
     )
+
+    jobcard = sum(
+        1 for order in orders
+        if order.status == "Job Card"
+    )
+
+    printing = sum(
+        1 for order in orders
+        if order.status == "Printing"
+    )
+
+    packing = sum(
+        1 for order in orders
+        if order.status == "Packing"
+    )
+
+    dispatched = sum(
+        1 for order in orders
+        if order.status == "Dispatched"
+    )
+
+    completed = sum(
+        1 for order in orders
+        if order.status == "Delivered"
+    )
+
+    pending = total_orders - completed
+
+    # Financial information ONLY for owner
+    if role == 'owner':
+
+        total_revenue = sum(
+            float(order.amount or 0)
+            for order in orders
+        )
+
+    else:
+
+        total_revenue = 0
 
     return render_template(
         'dashboard.html',
@@ -229,8 +310,14 @@ def dashboard():
         printing=printing,
         packing=packing,
         dispatched=dispatched,
-        total_revenue=total_revenue
+        completed=completed,
+        pending=pending,
+        total_revenue=total_revenue,
+        role=role,
+              username=username
     )
+
+
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
 def edit_order(id):
 
@@ -436,18 +523,70 @@ def track(order_no):
 @app.route('/order/<int:id>')
 def order_detail(id):
 
-    if 'user' not in session:
+    if 'user_id' not in session:
         return redirect('/login')
 
     order = Order.query.get_or_404(id)
 
+    role = session.get('role')
+    username = session.get('user')
+
+    # Designer can see ONLY their own assigned orders
+    if role == 'designer':
+        if order.staff_name != username:
+            return "Access Denied", 403
+
     return render_template(
         'order_detail.html',
-        order=order
+        order=order,
+        role=role,
+        username=username
     )
 
 with app.app_context():
-    db.create_all() 
+
+    db.create_all()
+
+    owner = User.query.filter_by(username="pingax").first()
+
+    if not owner:
+
+        owner = User(
+            name="Owner",
+            username="pingax",
+            password="pingax@123",
+            role="owner"
+        )
+
+        db.session.add(owner)
+        db.session.commit()
+with app.app_context():
+    db.create_all()
+
+    owner = User.query.filter_by(username="pingax").first()
+
+    if not owner:
+        owner = User(
+            name="Owner",
+            username="pingax",
+            password="pingax@123",
+            role="owner"
+        )
+        db.session.add(owner)
+        db.session.commit()
+
+    designer = User.query.filter_by(username="designer1").first()
+
+    if not designer:
+        designer = User(
+            name="Designer One",
+            username="designer1",
+            password="designer@123",
+            role="designer"
+        )
+        db.session.add(designer)
+        db.session.commit()
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
