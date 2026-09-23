@@ -2,96 +2,407 @@
 
 {% block content %}
 
+<!-- PAGE TITLE -->
 <h2 class="mb-4">
     👋 Welcome {{ username }}
 </h2>
 
+
+<!-- ===================================================== -->
+<!-- DESIGNER DASHBOARD -->
+<!-- ===================================================== -->
+
+{% if role == 'designer' %}
+
+<h5 class="mb-3">
+    <b>My Dashboard</b>
+</h5>
+
+
+<!-- ===================================================== -->
+<!-- DESIGNER SUMMARY CARDS -->
+<!-- ===================================================== -->
+
+<div class="row g-4 mb-5">
+
+    <!-- MY TOTAL ORDERS -->
+    <div class="col-md-4">
+
+        <a href="/my-orders"
+           style="text-decoration:none; color:inherit;">
+
+            <div class="card dashboard-card">
+
+                <div class="card-body">
+
+                    <div class="card-number card-green">
+                        {{ total_orders }}
+                    </div>
+
+                    <p>My Total Orders</p>
+
+                    <small class="text-muted">
+                        Click to view all orders
+                    </small>
+
+                </div>
+
+            </div>
+
+        </a>
+
+    </div>
+
+
+    <!-- PENDING ORDERS -->
+    <div class="col-md-4">
+
+        <a href="/my-pending-orders"
+           style="text-decoration:none; color:inherit;">
+
+            <div class="card dashboard-card">
+
+                <div class="card-body">
+
+                    <div class="card-number card-orange">
+                        {{ pending }}
+                    </div>
+
+                    <p>Pending Orders</p>
+
+                    <small class="text-muted">
+                        Click to view pending orders
+                    </small>
+
+                </div>
+
+            </div>
+
+        </a>
+
+    </div>
+
+
+    <!-- COMPLETED ORDERS -->
+    <div class="col-md-4">
+
+        <a href="/my-completed-orders"
+           style="text-decoration:none; color:inherit;">
+
+            <div class="card dashboard-card">
+
+                <div class="card-body">
+
+                    <div class="card-number card-blue">
+                        {{ completed }}
+                    </div>
+
+                    <p>Completed Orders</p>
+
+                    <small class="text-muted">
+                        Click to view completed orders
+                    </small>
+
+                </div>
+
+            </div>
+
+        </a>
+
+    </div>
+
+</div>
+
+<!-- ===================================================== -->
+<!-- OWNER DASHBOARD -->
+<!-- ===================================================== -->
+
+{% else %}
+
+
+<!-- SEARCH -->
+
 <form action="/search" class="mb-4">
-    <input class="form-control search-box" name="q" placeholder="🔍 Search Order / Client">
+
+    <input
+        class="form-control search-box"
+        name="q"
+        placeholder="🔍 Search Order / Client">
+
 </form>
 
-<h5 class="mb-3"><b>Overview</b></h5>
+
+<!-- OVERVIEW -->
+
+<h5 class="mb-3">
+    <b>Overview</b>
+</h5>
+
 
 <div class="row g-4 mb-5">
+
+
+    <!-- TOTAL ORDERS -->
+
     <div class="col-md-4">
+
         <div class="card dashboard-card">
+
             <div class="card-body">
-                <div class="card-number card-green">{{ total_orders }}</div>
-                <p>Total Orders</p>
-            </div>
-        </div>
-    </div>
-<div class="col-md-4">
-    <div class="card dashboard-card">
-        <div class="card-body">
-            <div class="card-number card-orange">{{ design }}</div>
-            <p>Design</p>
-        </div>
-    </div>
-</div>
-<div class="col-md-4">
-    <div class="card dashboard-card">
-        <div class="card-body">
-            <div class="card-number card-green">{{ jobcard }}</div>
-            <p>Job Card</p>
-        </div>
-    </div>
-</div>
-<div class="row g-4 mb-5">
-    <div class="col-md-4">
-        <div class="card dashboard-card">
-            <div class="card-body">
-                <div class="card-number card-blue">{{ printing }}</div>
-                <p>Printing</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card dashboard-card">
-            <div class="card-body">
-                <div class="card-number card-orange">{{ packing }}</div>
-                <p>Packing</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card dashboard-card">
-            <div class="card-body">
-                <div class="card-number card-blue">{{ dispatched }}</div>
-                <p>Dispatched</p>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="card dashboard-card">
-    <div class="card-header bg-white border-0 pt-4 ps-4">
-        <h5>📦 Recent Orders</h5>
-    </div>
-    <div class="card-body">
-        {% for order in orders %}
-        <div class="card order-card">
-            <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col-md-2"><b>#{{ order.order_no }}</b></div>
-                    <div class="col-md-3">{{ order.client_name }}</div>
-                    <div class="col-md-3">{{ order.product }}</div>
-                    <div class="col-md-2">
-                        {% if order.status == 'Design' %}<span class="status-design">Design</span>
-                        {% elif order.status == 'Printing' %}<span class="status-printing">Printing</span>
-                        {% elif order.status == 'Packing' %}<span class="status-packing">Packing</span>
-                        {% else %}<span class="status-dispatched">{{ order.status }}</span>
-                        {% endif %}
-                    </div>
-                    <div class="col-md-2 text-end">
-                        <a href="/order/{{order.id}}" class="btn btn-purple">View</a>
-                    </div>
+
+                <div class="card-number card-green">
+                    {{ total_orders }}
                 </div>
+
+                <p>Total Orders</p>
+
             </div>
+
         </div>
-        {% endfor %}
+
     </div>
+
+
+    <!-- DESIGN -->
+
+    <div class="col-md-4">
+
+        <div class="card dashboard-card">
+
+            <div class="card-body">
+
+                <div class="card-number card-orange">
+                    {{ design }}
+                </div>
+
+                <p>Design</p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- JOB CARD -->
+
+    <div class="col-md-4">
+
+        <div class="card dashboard-card">
+
+            <div class="card-body">
+
+                <div class="card-number card-green">
+                    {{ jobcard }}
+                </div>
+
+                <p>Job Card</p>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
 
-<a href="/add" class="quick-action">+</a>
+
+
+<!-- ===================================================== -->
+<!-- PRODUCTION STATUS -->
+<!-- ===================================================== -->
+
+<div class="row g-4 mb-5">
+
+
+    <!-- PRINTING -->
+
+    <div class="col-md-4">
+
+        <div class="card dashboard-card">
+
+            <div class="card-body">
+
+                <div class="card-number card-blue">
+                    {{ printing }}
+                </div>
+
+                <p>Printing</p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- PACKING -->
+
+    <div class="col-md-4">
+
+        <div class="card dashboard-card">
+
+            <div class="card-body">
+
+                <div class="card-number card-orange">
+                    {{ packing }}
+                </div>
+
+                <p>Packing</p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- DISPATCHED -->
+
+    <div class="col-md-4">
+
+        <div class="card dashboard-card">
+
+            <div class="card-body">
+
+                <div class="card-number card-blue">
+                    {{ dispatched }}
+                </div>
+
+                <p>Dispatched</p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ===================================================== -->
+<!-- ALL ORDERS FOR OWNER -->
+<!-- ===================================================== -->
+
+<div class="card dashboard-card">
+
+    <div class="card-header bg-white border-0 pt-4 ps-4">
+
+        <h5>📦 All Orders</h5>
+
+    </div>
+
+
+    <div class="card-body">
+
+        {% for order in orders %}
+
+        <div class="card order-card mb-3">
+
+            <div class="card-body">
+
+                <div class="row align-items-center">
+
+
+                    <!-- ORDER NUMBER -->
+
+                    <div class="col-md-2">
+
+                        <b>
+                            #{{ order.order_no }}
+                        </b>
+
+                    </div>
+
+
+                    <!-- CLIENT -->
+
+                    <div class="col-md-3">
+
+                        {{ order.client_name }}
+
+                    </div>
+
+
+                    <!-- PRODUCT -->
+
+                    <div class="col-md-3">
+
+                        {{ order.product }}
+
+                    </div>
+
+
+                    <!-- STATUS -->
+
+                    <div class="col-md-2">
+
+                        {% if order.status == 'Design' %}
+
+                            <span class="status-design">
+                                Design
+                            </span>
+
+                        {% elif order.status == 'Printing' %}
+
+                            <span class="status-printing">
+                                Printing
+                            </span>
+
+                        {% elif order.status == 'Packing' %}
+
+                            <span class="status-packing">
+                                Packing
+                            </span>
+
+                        {% else %}
+
+                            <span class="status-dispatched">
+                                {{ order.status }}
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- VIEW -->
+
+                    <div class="col-md-2 text-end">
+
+                        <a
+                            href="/order/{{ order.id }}"
+                            class="btn btn-purple">
+
+                            View
+
+                        </a>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+
+
+<!-- QUICK ADD ORDER -->
+
+<a href="/add" class="quick-action">
+    +
+</a>
+
+
+{% endif %}
 
 {% endblock %}

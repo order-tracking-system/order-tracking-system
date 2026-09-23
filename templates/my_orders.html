@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card dashboard-card">
+
+    <div class="card-header bg-white border-0 pt-4 ps-4">
+
+        <h4>{{ page_title }}</h4>
+
+        <p class="text-muted mb-0">
+            Designer: <b>{{ username }}</b>
+        </p>
+
+    </div>
+
+    <div class="card-body">
+
+        {% if orders %}
+
+            {% for order in orders %}
+
+            <div class="card order-card mb-3">
+
+                <div class="card-body">
+
+                    <div class="row align-items-center">
+
+                        <div class="col-md-2">
+                            <b>#{{ order.order_no }}</b>
+                        </div>
+
+                        <div class="col-md-3">
+                            <b>Client:</b><br>
+                            {{ order.client_name }}
+                        </div>
+
+                        <div class="col-md-2">
+                            <b>Product:</b><br>
+                            {{ order.product }}
+                        </div>
+
+                        <div class="col-md-2">
+
+                            <b>Status:</b><br>
+
+                            {% if order.status == 'Design' %}
+
+                                <span class="status-design">
+                                    Design
+                                </span>
+
+                            {% elif order.status == 'Job Card' %}
+
+                                <span class="status-dispatched">
+                                    Job Card
+                                </span>
+
+                            {% elif order.status == 'Printing' %}
+
+                                <span class="status-printing">
+                                    Printing
+                                </span>
+
+                            {% elif order.status == 'Packing' %}
+
+                                <span class="status-packing">
+                                    Packing
+                                </span>
+
+                            {% elif order.status == 'Delivered' %}
+
+                                <span class="status-dispatched">
+                                    Completed
+                                </span>
+
+                            {% else %}
+
+                                <span class="status-dispatched">
+                                    {{ order.status }}
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                        <div class="col-md-3 text-end">
+
+                            <a
+                                href="/order/{{ order.id }}"
+                                class="btn btn-purple">
+                                View Order
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="text-center py-5">
+
+                <h5>No Orders Found</h5>
+
+                <p class="text-muted">
+                    There are no orders in this section.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<br>
+
+<a href="/dashboard" class="btn btn-secondary">
+    ← Back to Dashboard
+</a>
+
+{% endblock %}

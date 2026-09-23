@@ -2,6 +2,8 @@
 
 {% block content %}
 
+<!-- ================= ORDER DETAILS ================= -->
+
 <div class="card dashboard-card">
 
     <div class="card-body">
@@ -30,10 +32,12 @@
                     <b>Client:</b>
                     {{ order.client_name }}
                 </p>
+
                 <p>
                     <b>Order Date:</b>
                     {{ order.order_date }}
                 </p>
+
                 <p>
                     <b>Mobile:</b>
                     {{ order.mobile }}
@@ -55,6 +59,7 @@
                 </p>
 
             </div>
+
 
             <!-- RIGHT SIDE -->
 
@@ -99,7 +104,7 @@
                 <hr>
 
                 <p>
-                    <b>Staff:</b>
+                    <b>Assigned Designer:</b>
                     {{ order.staff_name }}
                 </p>
 
@@ -121,12 +126,72 @@
 
 </div>
 
+
 <br>
+
+
+<!-- ================================================= -->
+<!--                 DESIGNER VIEW                    -->
+<!-- ================================================= -->
+
+{% if role == 'designer' %}
 
 <div class="card dashboard-card">
 
     <div class="card-header">
-        Production Timeline
+        <b>Design Work</b>
+    </div>
+
+    <div class="card-body">
+
+        <p>
+            <b>Assigned Designer:</b>
+            {{ username }}
+        </p>
+
+        <p>
+            <b>Current Status:</b>
+            {{ order.status }}
+        </p>
+
+        <hr>
+
+        {% if order.status == 'Design' %}
+
+            <a href="/update/{{ order.id }}/Job Card"
+               class="btn btn-success">
+                Design Completed
+            </a>
+
+        {% elif order.status == 'Job Card' %}
+
+            <div class="alert alert-success mb-0">
+                Design completed. Order sent to production.
+            </div>
+
+        {% else %}
+
+            <div class="alert alert-info mb-0">
+                This order has already moved to production.
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- ================================================= -->
+<!--                  OWNER VIEW                      -->
+<!-- ================================================= -->
+
+{% else %}
+
+<div class="card dashboard-card">
+
+    <div class="card-header">
+        <b>Production Timeline</b>
     </div>
 
     <div class="card-body">
@@ -134,38 +199,38 @@
         <div class="timeline">
 
             <a class="btn btn-primary"
-               href="/update/{{order.id}}/Design">
-               Design
+               href="/update/{{ order.id }}/Design">
+                Design
             </a>
-            
+
             <a class="btn btn-secondary"
-               href="/update/{{order.id}}/Job Card">
-               Job Card
+               href="/update/{{ order.id }}/Job Card">
+                Job Card
             </a>
 
             <a class="btn btn-success"
-               href="/update/{{order.id}}/Printing">
-               Printing
+               href="/update/{{ order.id }}/Printing">
+                Printing
             </a>
 
             <a class="btn btn-warning"
-               href="/update/{{order.id}}/Packing">
-               Packing
+               href="/update/{{ order.id }}/Packing">
+                Packing
             </a>
 
             <a class="btn btn-info"
-               href="/update/{{order.id}}/Ready Dispatch">
-               Ready Dispatch
+               href="/update/{{ order.id }}/Ready Dispatch">
+                Ready Dispatch
             </a>
 
             <a class="btn btn-dark"
-               href="/update/{{order.id}}/Dispatched">
-               Dispatched
+               href="/update/{{ order.id }}/Dispatched">
+                Dispatched
             </a>
 
             <a class="btn btn-secondary"
-               href="/update/{{order.id}}/Delivered">
-               Delivered
+               href="/update/{{ order.id }}/Delivered">
+                Delivered
             </a>
 
         </div>
@@ -174,26 +239,31 @@
 
 </div>
 
+
 <br><br>
+
+
+<!-- OWNER ACTIONS -->
 
 <a href="/edit/{{ order.id }}"
    class="btn btn-warning">
-   Edit Order
+    Edit Order
 </a>
 
 <a href="/delete/{{ order.id }}"
    class="btn btn-danger"
    onclick="return confirm('Delete this order?')">
-   Delete Order
+    Delete Order
 </a>
 
 <br><br>
 
-<br>
-
-<a href="/dispatch/{{order.id}}"
+<a href="/dispatch/{{ order.id }}"
    class="btn btn-purple">
-   Dispatch Entry
+    Dispatch Entry
 </a>
+
+{% endif %}
+
 
 {% endblock %}

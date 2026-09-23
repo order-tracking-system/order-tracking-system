@@ -120,19 +120,30 @@
                 <!-- Staff -->
                <!-- Assign Designer -->
 <div class="col-md-6 mb-3">
+
     <label>Assign Designer</label>
 
-    <select class="form-control" name="staff_name" required>
+    <input
+        type="text"
+        class="form-control"
+        name="staff_name"
+        list="designerList"
+        placeholder="Type designer name"
+        required
+    >
 
-        <option value="">Select Designer</option>
+    <datalist id="designerList">
 
         {% for designer in designers %}
+
             <option value="{{ designer.username }}">
                 {{ designer.name }}
             </option>
+
         {% endfor %}
 
-    </select>
+    </datalist>
+
 </div>
 
                 <div class="col-md-6 mb-3">

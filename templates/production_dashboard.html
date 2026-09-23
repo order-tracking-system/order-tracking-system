@@ -1,0 +1,489 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2 class="mb-4">
+    👋 Welcome {{ username }}
+</h2>
+
+<h5 class="mb-3">
+    <b>Production Dashboard</b>
+</h5>
+
+
+<!-- ==============================
+     PRODUCTION CARDS
+================================ -->
+
+<div class="row g-4 mb-5">
+
+    <!-- JOB CARD -->
+
+    <div class="col-md-3">
+
+        <a href="#jobcard"
+           style="text-decoration:none; color:inherit;">
+
+            <div class="card dashboard-card">
+
+                <div class="card-body">
+
+                    <div class="card-number card-orange">
+                        {{ jobcard_orders|length }}
+                    </div>
+
+                    <p>Job Card</p>
+
+                    <small class="text-muted">
+                        Orders ready for production
+                    </small>
+
+                </div>
+
+            </div>
+
+        </a>
+
+    </div>
+
+
+    <!-- PRINTING -->
+
+    <div class="col-md-3">
+
+        <a href="#printing"
+           style="text-decoration:none; color:inherit;">
+
+            <div class="card dashboard-card">
+
+                <div class="card-body">
+
+                    <div class="card-number card-blue">
+                        {{ printing_orders|length }}
+                    </div>
+
+                    <p>Printing</p>
+
+                    <small class="text-muted">
+                        Orders currently printing
+                    </small>
+
+                </div>
+
+            </div>
+
+        </a>
+
+    </div>
+
+
+    <!-- PACKING -->
+
+    <div class="col-md-3">
+
+        <a href="#packing"
+           style="text-decoration:none; color:inherit;">
+
+            <div class="card dashboard-card">
+
+                <div class="card-body">
+
+                    <div class="card-number card-green">
+                        {{ packing_orders|length }}
+                    </div>
+
+                    <p>Packing</p>
+
+                    <small class="text-muted">
+                        Orders in packing
+                    </small>
+
+                </div>
+
+            </div>
+
+        </a>
+
+    </div>
+
+
+    <!-- READY DISPATCH -->
+
+    <div class="col-md-3">
+
+        <a href="#ready-dispatch"
+           style="text-decoration:none; color:inherit;">
+
+            <div class="card dashboard-card">
+
+                <div class="card-body">
+
+                    <div class="card-number card-orange">
+                        {{ ready_dispatch_orders|length }}
+                    </div>
+
+                    <p>Ready for Dispatch</p>
+
+                    <small class="text-muted">
+                        Production completed
+                    </small>
+
+                </div>
+
+            </div>
+
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- ==============================
+     JOB CARD ORDERS
+================================ -->
+
+<div class="card dashboard-card mb-4"
+     id="jobcard">
+
+    <div class="card-header bg-white border-0 pt-4 ps-4">
+
+        <h5>
+            Job Card Orders
+        </h5>
+
+    </div>
+
+    <div class="card-body">
+
+        {% if jobcard_orders %}
+
+            {% for order in jobcard_orders %}
+
+            <div class="card order-card mb-3">
+
+                <div class="card-body">
+
+                    <div class="row align-items-center">
+
+                        <div class="col-md-2">
+                            <b>#{{ order.order_no }}</b>
+                        </div>
+
+                        <div class="col-md-3">
+                            <b>Client:</b><br>
+                            {{ order.client_name }}
+                        </div>
+
+                        <div class="col-md-2">
+                            <b>Product:</b><br>
+                            {{ order.product }}
+                        </div>
+
+                        <div class="col-md-2">
+                            <b>Quantity:</b><br>
+                            {{ order.quantity }}
+                        </div>
+
+                        <div class="col-md-3 text-end">
+
+                            <a href="/order/{{ order.id }}"
+                               class="btn btn-purple">
+
+                                View Order
+
+                            </a>
+
+                            <a href="/update/{{ order.id }}/Printing"
+                               class="btn btn-primary">
+
+                                Start Printing
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p class="text-muted">
+                No Job Card orders.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- ==============================
+     PRINTING ORDERS
+================================ -->
+
+<div class="card dashboard-card mb-4"
+     id="printing">
+
+    <div class="card-header bg-white border-0 pt-4 ps-4">
+
+        <h5>
+            Printing Orders
+        </h5>
+
+    </div>
+
+    <div class="card-body">
+
+        {% if printing_orders %}
+
+            {% for order in printing_orders %}
+
+            <div class="card order-card mb-3">
+
+                <div class="card-body">
+
+                    <div class="row align-items-center">
+
+                        <div class="col-md-2">
+                            <b>#{{ order.order_no }}</b>
+                        </div>
+
+                        <div class="col-md-3">
+                            <b>Client:</b><br>
+                            {{ order.client_name }}
+                        </div>
+
+                        <div class="col-md-2">
+                            <b>Product:</b><br>
+                            {{ order.product }}
+                        </div>
+
+                        <div class="col-md-2">
+                            <b>Quantity:</b><br>
+                            {{ order.quantity }}
+                        </div>
+
+                        <div class="col-md-3 text-end">
+
+                            <a href="/order/{{ order.id }}"
+                               class="btn btn-purple">
+
+                                View Order
+
+                            </a>
+
+                            <a href="/update/{{ order.id }}/Packing"
+                               class="btn btn-success">
+
+                                Move to Packing
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p class="text-muted">
+                No Printing orders.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- ==============================
+     PACKING ORDERS
+================================ -->
+
+<div class="card dashboard-card mb-4"
+     id="packing">
+
+    <div class="card-header bg-white border-0 pt-4 ps-4">
+
+        <h5>
+            Packing Orders
+        </h5>
+
+    </div>
+
+    <div class="card-body">
+
+        {% if packing_orders %}
+
+            {% for order in packing_orders %}
+
+            <div class="card order-card mb-3">
+
+                <div class="card-body">
+
+                    <div class="row align-items-center">
+
+                        <div class="col-md-2">
+                            <b>#{{ order.order_no }}</b>
+                        </div>
+
+                        <div class="col-md-3">
+                            <b>Client:</b><br>
+                            {{ order.client_name }}
+                        </div>
+
+                        <div class="col-md-2">
+                            <b>Product:</b><br>
+                            {{ order.product }}
+                        </div>
+
+                        <div class="col-md-2">
+                            <b>Quantity:</b><br>
+                            {{ order.quantity }}
+                        </div>
+
+                        <div class="col-md-3 text-end">
+
+                            <a href="/order/{{ order.id }}"
+                               class="btn btn-purple">
+
+                                View Order
+
+                            </a>
+
+                            <a href="/update/{{ order.id }}/Ready%20Dispatch"
+                               class="btn btn-warning">
+
+                                Ready Dispatch
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p class="text-muted">
+                No Packing orders.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- ==============================
+     READY FOR DISPATCH
+================================ -->
+
+<div class="card dashboard-card mb-4"
+     id="ready-dispatch">
+
+    <div class="card-header bg-white border-0 pt-4 ps-4">
+
+        <h5>
+            Ready for Dispatch
+        </h5>
+
+    </div>
+
+    <div class="card-body">
+
+        {% if ready_dispatch_orders %}
+
+            {% for order in ready_dispatch_orders %}
+
+            <div class="card order-card mb-3">
+
+                <div class="card-body">
+
+                    <div class="row align-items-center">
+
+                        <div class="col-md-2">
+                            <b>#{{ order.order_no }}</b>
+                        </div>
+
+                        <div class="col-md-3">
+                            <b>Client:</b><br>
+                            {{ order.client_name }}
+                        </div>
+
+                        <div class="col-md-2">
+                            <b>Product:</b><br>
+                            {{ order.product }}
+                        </div>
+
+                        <div class="col-md-2">
+                            <b>Quantity:</b><br>
+                            {{ order.quantity }}
+                        </div>
+
+                        <div class="col-md-3 text-end">
+
+                            <a href="/order/{{ order.id }}"
+                               class="btn btn-purple">
+
+                                View Order
+
+                            </a>
+
+                            <a href="/dispatch/{{ order.id }}"
+                               class="btn btn-dark">
+
+                                Dispatch
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p class="text-muted">
+                No orders ready for dispatch.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<a href="/dashboard"
+   class="btn btn-secondary">
+
+    ← Back to Dashboard
+
+</a>
+
+{% endblock %}
