@@ -39,15 +39,6 @@ app.config["SQLALCHEMY_DATABASE_URI"] = (
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
-    order_date = db.Column(db.Date)
-
-    outside_gsm = db.Column(
-        db.String(50)
-    )
-
-    outside_color = db.Column(
-        db.String(50)
-    )
 class Customer(db.Model):
 
     id = db.Column(
