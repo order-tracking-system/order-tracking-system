@@ -711,27 +711,42 @@ def my_completed_orders():
 # ==================================================
 # DASHBOARD
 # ==================================================
+# ==================================================
+# DASHBOARD
+# ==================================================
 
 @app.route('/dashboard')
 def dashboard():
 
     if 'user_id' not in session:
-
         return redirect('/login')
 
-    role = session.get(
-        'role'
-    )
+    role = session.get('role')
+    username = session.get('user')
 
-    username = session.get(
-        'user'
-    )
+    # ------------------------------------------
+    # PRODUCTION STAFF
+    # Always send production staff to
+    # Production Dashboard
+    # ------------------------------------------
+
+    if role == 'production':
+
+        return redirect('/production-dashboard')
+
+    # ------------------------------------------
+    # OWNER
+    # ------------------------------------------
 
     if role == 'owner':
 
         orders = Order.query.order_by(
             Order.id.desc()
         ).all()
+
+    # ------------------------------------------
+    # DESIGNER
+    # ------------------------------------------
 
     elif role == 'designer':
 
@@ -744,6 +759,10 @@ def dashboard():
     else:
 
         orders = []
+
+    # ------------------------------------------
+    # COUNTS
+    # ------------------------------------------
 
     total_orders = len(orders)
 
@@ -783,9 +802,11 @@ def dashboard():
         if order.status == "Delivered"
     )
 
-    pending = (
-        total_orders - completed
-    )
+    pending = total_orders - completed
+
+    # ------------------------------------------
+    # REVENUE
+    # ------------------------------------------
 
     if role == 'owner':
 
@@ -797,6 +818,39 @@ def dashboard():
     else:
 
         total_revenue = 0
+
+    # ------------------------------------------
+    # DASHBOARD
+    # ------------------------------------------
+
+    return render_template(
+
+        'dashboard.html',
+
+        orders=orders,
+
+        total_orders=total_orders,
+
+        design=design,
+
+        jobcard=jobcard,
+
+        printing=printing,
+
+        packing=packing,
+
+        dispatched=dispatched,
+
+        completed=completed,
+
+        pending=pending,
+
+        total_revenue=total_revenue,
+
+        role=role,
+
+        username=username
+    )
 
     return render_template(
 
