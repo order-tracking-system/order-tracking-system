@@ -1210,7 +1210,6 @@ def production_dashboard():
         role=session.get('role')
     )
 
-
 # ==================================================
 # PRODUCTION BOARD
 # ==================================================
@@ -1219,43 +1218,71 @@ def production_dashboard():
 def production_board():
 
     if 'user_id' not in session:
-
         return redirect('/login')
 
-    design_orders = Order.query.filter_by(
-        status="Design"
-    ).order_by(
+    if session.get('role') not in ['production', 'owner']:
+        return "Access Denied", 403
+
+    # ------------------------------------------
+    # GET ALL ORDERS
+    # ------------------------------------------
+
+    all_orders = Order.query.order_by(
         Order.id.desc()
     ).all()
 
-    jobcard_orders = Order.query.filter_by(
-        status="Job Card"
-    ).order_by(
-        Order.id.desc()
-    ).all()
+    # ------------------------------------------
+    # DEBUG - CHECK STATUS
+    # ------------------------------------------
 
-    printing_orders = Order.query.filter_by(
-        status="Printing"
-    ).order_by(
-        Order.id.desc()
-    ).all()
+    print("========== PRODUCTION BOARD ==========")
 
-    packing_orders = Order.query.filter_by(
-        status="Packing"
-    ).order_by(
-        Order.id.desc()
-    ).all()
-
-    dispatch_orders = Order.query.filter(
-        Order.status.in_(
-            [
-                "Ready Dispatch",
-                "Dispatched"
-            ]
+    for order in all_orders:
+        print(
+            order.order_no,
+            "|",
+            order.client_name,
+            "| STATUS =",
+            repr(order.status)
         )
-    ).order_by(
-        Order.id.desc()
-    ).all()
+
+    # ------------------------------------------
+    # FILTER ORDERS
+    # ------------------------------------------
+
+    design_orders = [
+        order for order in all_orders
+        if (order.status or "").strip().lower() == "design"
+    ]
+
+    jobcard_orders = [
+        order for order in all_orders
+        if (order.status or "").strip().lower() == "job card"
+    ]
+
+    printing_orders = [
+        order for order in all_orders
+        if (order.status or "").strip().lower() == "printing"
+    ]
+
+    packing_orders = [
+        order for order in all_orders
+        if (order.status or "").strip().lower() == "packing"
+    ]
+
+    dispatch_orders = [
+        order for order in all_orders
+        if (order.status or "").strip().lower()
+        in ["ready dispatch", "dispatched"]
+    ]
+
+    print("DESIGN ORDERS:", len(design_orders))
+    print("JOB CARD ORDERS:", len(jobcard_orders))
+    print("PRINTING ORDERS:", len(printing_orders))
+    print("PACKING ORDERS:", len(packing_orders))
+    print("DISPATCH ORDERS:", len(dispatch_orders))
+
+    print("======================================")
 
     return render_template(
 
@@ -1275,7 +1302,6 @@ def production_board():
 
         role=session.get('role')
     )
-
 
 # ==================================================
 # REPORTS DASHBOARD

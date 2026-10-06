@@ -2,245 +2,257 @@
 
 {% block content %}
 
-<h2 class="mb-4">
-Production Board
-</h2>
+<div class="container mt-4">
 
-<div class="row">
+    <h2>Production Board</h2>
 
-<div class="col-md-3">
+    <p>
+        Welcome,
+        <strong>{{ username }}</strong>
+    </p>
 
-<div class="card dashboard-card">
 
-<div class="card-header bg-primary text-white">
+    <!-- ============================= -->
+    <!-- DESIGN -->
+    <!-- ============================= -->
 
-Design
+    <div class="card mb-4">
 
-</div>
+        <div class="card-header">
+            <h4>
+                Design
+                <span>
+                    ({{ design_orders|length }})
+                </span>
+            </h4>
+        </div>
 
-<div class="card-body">
+        <div class="card-body">
 
-{% for order in design_orders %}
+            {% if design_orders %}
 
-<div class="card order-card">
+                {% for order in design_orders %}
 
-<div class="card-body">
+                    <div class="border rounded p-3 mb-2">
 
-<b>{{ order.order_no }}</b>
+                        <strong>
+                            #{{ order.order_no }}
+                        </strong>
 
-<br>
+                        -
 
-{{ order.client_name }}
+                        {{ order.client_name }}
 
-<br><br>
+                        <br>
 
-<a
-href="/order/{{order.id}}"
-class="btn btn-sm btn-primary">
+                        <small>
+                            Product:
+                            {{ order.product }}
+                        </small>
 
-Open
+                        <br>
 
-</a>
+                        <small>
+                            Designer:
+                            {{ order.staff_name or 'Not Assigned' }}
+                        </small>
 
-</div>
+                    </div>
 
-</div>
+                {% endfor %}
 
-{% endfor %}
+            {% else %}
 
-</div>
+                <p>No Design Orders</p>
 
-</div>
+            {% endif %}
 
-</div>
+        </div>
 
-<div class="col-md-3">
+    </div>
 
-<div class="card dashboard-card">
 
-<div class="card-header bg-secondary text-white">
+    <!-- ============================= -->
+    <!-- JOB CARD -->
+    <!-- ============================= -->
 
-Job Card
+    <div class="card mb-4">
 
-</div>
+        <div class="card-header">
+            <h4>
+                Job Card
+                ({{ jobcard_orders|length }})
+            </h4>
+        </div>
 
-<div class="card-body">
+        <div class="card-body">
 
-{% for order in jobcard_orders %}
+            {% if jobcard_orders %}
 
-<div class="card order-card">
+                {% for order in jobcard_orders %}
 
-<div class="card-body">
+                    <div class="border rounded p-3 mb-2">
 
-<b>{{ order.order_no }}</b>
+                        <strong>
+                            #{{ order.order_no }}
+                        </strong>
 
-<br>
+                        -
 
-{{ order.client_name }}
+                        {{ order.client_name }}
 
-<br><br>
+                    </div>
 
-<a
-href="/order/{{order.id}}"
-class="btn btn-sm btn-secondary">
+                {% endfor %}
 
-Open
+            {% else %}
 
-</a>
+                <p>No Job Card Orders</p>
 
-</div>
+            {% endif %}
 
-</div>
+        </div>
 
-{% endfor %}
+    </div>
 
-</div>
 
-</div>
+    <!-- ============================= -->
+    <!-- PRINTING -->
+    <!-- ============================= -->
 
-</div>
+    <div class="card mb-4">
 
-<br><br>
+        <div class="card-header">
+            <h4>
+                Printing
+                ({{ printing_orders|length }})
+            </h4>
+        </div>
 
-<div class="col-md-3">
+        <div class="card-body">
 
-<div class="card dashboard-card">
+            {% if printing_orders %}
 
-<div class="card-header bg-success text-white">
+                {% for order in printing_orders %}
 
-Printing
+                    <div class="border rounded p-3 mb-2">
 
-</div>
+                        <strong>
+                            #{{ order.order_no }}
+                        </strong>
 
-<div class="card-body">
+                        -
 
-{% for order in printing_orders %}
+                        {{ order.client_name }}
 
-<div class="card order-card">
+                    </div>
 
-<div class="card-body">
+                {% endfor %}
 
-<b>{{ order.order_no }}</b>
+            {% else %}
 
-<br>
+                <p>No Printing Orders</p>
 
-{{ order.client_name }}
+            {% endif %}
 
-<br><br>
+        </div>
 
-<a
-href="/order/{{order.id}}"
-class="btn btn-sm btn-success">
+    </div>
 
-Open
 
-</a>
+    <!-- ============================= -->
+    <!-- PACKING -->
+    <!-- ============================= -->
 
-</div>
+    <div class="card mb-4">
 
-</div>
+        <div class="card-header">
+            <h4>
+                Packing
+                ({{ packing_orders|length }})
+            </h4>
+        </div>
 
-{% endfor %}
+        <div class="card-body">
 
-</div>
+            {% if packing_orders %}
 
-</div>
+                {% for order in packing_orders %}
 
-</div>
+                    <div class="border rounded p-3 mb-2">
 
-<div class="col-md-3">
+                        <strong>
+                            #{{ order.order_no }}
+                        </strong>
 
-<div class="card dashboard-card">
+                        -
 
-<div class="card-header bg-warning">
+                        {{ order.client_name }}
 
-Packing
+                    </div>
 
-</div>
+                {% endfor %}
 
-<div class="card-body">
+            {% else %}
 
-{% for order in packing_orders %}
+                <p>No Packing Orders</p>
 
-<div class="card order-card">
+            {% endif %}
 
-<div class="card-body">
+        </div>
 
-<b>{{ order.order_no }}</b>
+    </div>
 
-<br>
 
-{{ order.client_name }}
+    <!-- ============================= -->
+    <!-- DISPATCH -->
+    <!-- ============================= -->
 
-<br><br>
+    <div class="card mb-4">
 
-<a
-href="/order/{{order.id}}"
-class="btn btn-sm btn-warning">
+        <div class="card-header">
+            <h4>
+                Dispatch
+                ({{ dispatch_orders|length }})
+            </h4>
+        </div>
 
-Open
+        <div class="card-body">
 
-</a>
+            {% if dispatch_orders %}
 
-</div>
+                {% for order in dispatch_orders %}
 
-</div>
+                    <div class="border rounded p-3 mb-2">
 
-{% endfor %}
+                        <strong>
+                            #{{ order.order_no }}
+                        </strong>
 
-</div>
+                        -
 
-</div>
+                        {{ order.client_name }}
 
-</div>
+                        <br>
 
-<br><br>
+                        <small>
+                            Status:
+                            {{ order.status }}
+                        </small>
 
-<div class="col-md-3">
+                    </div>
 
-<div class="card dashboard-card">
+                {% endfor %}
 
-<div class="card-header bg-dark text-white">
+            {% else %}
 
-Dispatch
+                <p>No Dispatch Orders</p>
 
-</div>
+            {% endif %}
 
-<div class="card-body">
+        </div>
 
-{% for order in dispatch_orders %}
-
-<div class="card order-card">
-
-<div class="card-body">
-
-<b>{{ order.order_no }}</b>
-
-<br>
-
-{{ order.client_name }}
-
-<br><br>
-
-<a
-href="/order/{{order.id}}"
-class="btn btn-sm btn-dark">
-
-Open
-
-</a>
-
-</div>
-
-</div>
-
-{% endfor %}
-
-</div>
-
-</div>
-
-</div>
+    </div>
 
 </div>
 
