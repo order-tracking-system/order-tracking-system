@@ -1,10 +1,10 @@
-from sqlalchemy import func
 from datetime import datetime, date
+from io import BytesIO
+import os
+
 from flask import Flask, render_template, request, redirect, session, send_file
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import inspect, text
-from io import BytesIO
-import os
 import openpyxl
 
 
@@ -237,28 +237,52 @@ class Order(db.Model):
 
 with app.app_context():
 
-    db.create_all()
-
     try:
+
+        # ------------------------------------------
+        # CREATE TABLES IF THEY DO NOT EXIST
+        # ------------------------------------------
+
+        db.create_all()
+
+        # ------------------------------------------
+        # CHECK ORDER TABLE
+        # ------------------------------------------
 
         inspector = inspect(db.engine)
 
         tables = inspector.get_table_names()
 
+        print("DATABASE DRIVER:", db.engine.url.drivername)
+        print("DATABASE TABLES:", tables)
+
         if "order" in tables:
+
+            # --------------------------------------
+            # GET CURRENT ORDER COLUMNS
+            # --------------------------------------
 
             columns = [
                 column["name"]
                 for column in inspector.get_columns("order")
             ]
 
-            # ------------------------------------------
+            print("ORDER COLUMNS BEFORE MIGRATION:")
+            print(columns)
+
+            # --------------------------------------
             # ADD completed_date IF MISSING
-            # ------------------------------------------
+            # --------------------------------------
 
             if "completed_date" not in columns:
 
-                if db.engine.url.drivername.startswith("sqlite"):
+                print(
+                    "completed_date column missing."
+                )
+
+                if db.engine.url.drivername.startswith(
+                    "sqlite"
+                ):
 
                     db.session.execute(
                         text(
@@ -272,11 +296,22 @@ with app.app_context():
                     db.session.execute(
                         text(
                             'ALTER TABLE "order" '
-                            'ADD COLUMN IF NOT EXISTS completed_date DATE'
+                            'ADD COLUMN IF NOT EXISTS '
+                            'completed_date DATE'
                         )
                     )
 
                 db.session.commit()
+
+                print(
+                    "completed_date column added successfully."
+                )
+
+            else:
+
+                print(
+                    "completed_date column already exists."
+                )
 
     except Exception as e:
 
@@ -284,10 +319,8 @@ with app.app_context():
 
         print(
             "DATABASE MIGRATION ERROR:",
-            e
+            repr(e)
         )
-
-
 # ==================================================
 # LOGIN
 # ==================================================

@@ -1,3 +1,4 @@
+```html
 {% extends 'base.html' %}
 
 {% block content %}
@@ -40,30 +41,64 @@
                 <!-- Quantity -->
                 <div class="col-md-12 mb-3">
                     <label>Quantity</label>
-                    <input type="number" class="form-control" name="quantity">
+                    <input
+                        type="number"
+                        class="form-control"
+                        name="quantity">
                 </div>
 
+
+                <!-- ============================== -->
                 <!-- INSIDE PRINTING -->
-                <div class="col-md-6 mb-3">
-                    <div class="card p-3 h-100">
+                <!-- ============================== -->
+
+                <div class="col-md-12 mb-3">
+
+                    <div class="card p-3">
 
                         <h5 class="mb-3">Inside Printing</h5>
 
-                        <label>Process Type</label>
-                        <select class="form-control" name="inside_process">
-                            <option value="">Select</option>
-                            <option>UV</option>
-                            <option>Matte Lamination</option>
-                            <option>UV+Matte Lamination</option>
-                            <option>Drip-Off</option>
-                            <option>Glossy Lamination</option>
-                            <option>Emboss</option>
-                            <option>Other</option>
-                        </select>
+                        <!-- Process Type -->
+                        <div id="insideProcessContainer">
 
-                        <br>
+                            <div class="inside-process-row mb-3">
 
+                                <label>Process Type</label>
+
+                                <div class="input-group">
+
+                                    <select
+                                        class="form-control"
+                                        name="inside_process">
+
+                                        <option value="">Select</option>
+                                        <option>UV</option>
+                                        <option>Matte Lamination</option>
+                                        <option>UV+Matte Lamination</option>
+                                        <option>Drip-Off</option>
+                                        <option>Glossy Lamination</option>
+                                        <option>Emboss</option>
+                                        <option>Other</option>
+
+                                    </select>
+
+                                    <button
+                                        type="button"
+                                        class="btn btn-purple"
+                                        onclick="addInsideProcess()">
+                                        +
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Paper GSM -->
                         <label>Paper GSM</label>
+
                         <input
                             type="text"
                             class="form-control"
@@ -71,111 +106,104 @@
 
                         <br>
 
+
+                        <!-- Color Type -->
                         <label>Color Type</label>
-                        <select class="form-control" name="inside_color">
-                            <option>Single Color</option>
-                            <option>Multi Color</option>
-                        </select>
 
-                    </div>
-                </div>
-
-                <!-- OUTSIDE PRINTING -->
-                <div class="col-md-6 mb-3">
-                    <div class="card p-3 h-100">
-
-                        <h5 class="mb-3">Outside Printing</h5>
-
-                        <label>Process Type</label>
-                        <select class="form-control" name="outside_process">
-                            <option value="">Select</option>
-                            <option>UV</option>
-                            <option>Matte Lamination</option>
-                            <option>UV+Matte Lamination</option>
-                            <option>Drip-Off</option>
-                            <option>Glossy Lamination</option>
-                            <option>Emboss</option>
-                            <option>Other</option>
-                        </select>
-
-                        <br>
-
-                        <label>Paper GSM</label>
-                        <input
-                            type="text"
+                        <select
                             class="form-control"
-                            name="outside_gsm">
+                            name="inside_color">
 
-                        <br>
-                        <label>Color Type</label>
-                        <select class="form-control" name="outside_color">
-                            <option></option>
                             <option>Single Color</option>
                             <option>Multi Color</option>
+
                         </select>
 
                     </div>
+
                 </div>
 
-                <!-- Staff -->
-               <!-- Assign Designer -->
-<div class="col-md-6 mb-3">
 
-    <label>Assign Designer</label>
-
-    <input
-        type="text"
-        class="form-control"
-        name="staff_name"
-        list="designerList"
-        placeholder="Type designer name"
-        required
-    >
-
-    <datalist id="designerList">
-
-        {% for designer in designers %}
-
-            <option value="{{ designer.username }}">
-                {{ designer.name }}
-            </option>
-
-        {% endfor %}
-
-    </datalist>
-
-</div>
+                <!-- ============================== -->
+                <!-- ASSIGN DESIGNER -->
+                <!-- ============================== -->
 
                 <div class="col-md-6 mb-3">
-                    <label>Order Date</label>
+
+                    <label>Assign Designer</label>
+
                     <input
-                    type="date"
-                    class="form-control"
-                    name="order_date"
-                    required>
+                        type="text"
+                        class="form-control"
+                        name="staff_name"
+                        list="designerList"
+                        placeholder="Type designer name"
+                        required>
+
+                    <datalist id="designerList">
+
+                        {% for designer in designers %}
+
+                            <option value="{{ designer.username }}">
+                                {{ designer.name }}
+                            </option>
+
+                        {% endfor %}
+
+                    </datalist>
+
                 </div>
-                <!-- Delivery -->
+
+
+                <!-- Order Date -->
                 <div class="col-md-6 mb-3">
+
+                    <label>Order Date</label>
+
+                    <input
+                        type="date"
+                        class="form-control"
+                        name="order_date"
+                        required>
+
+                </div>
+
+
+                <!-- Delivery Date -->
+                <div class="col-md-6 mb-3">
+
                     <label>Delivery Date</label>
+
                     <input
                         type="date"
                         class="form-control"
                         name="delivery_date">
+
                 </div>
+
 
                 <!-- Notes -->
                 <div class="col-md-12 mb-3">
+
                     <label>Other Notes</label>
+
                     <textarea
                         class="form-control"
                         name="remarks"
                         rows="4"></textarea>
+
                 </div>
 
             </div>
 
-            <button class="btn btn-purple">
+
+            <!-- Save -->
+            <button
+                type="submit"
+                class="btn btn-purple">
+
                 Save Order
+
             </button>
 
         </form>
@@ -183,4 +211,62 @@
     </div>
 </div>
 
+
+<!-- ============================== -->
+<!-- JAVASCRIPT -->
+<!-- ============================== -->
+
+<script>
+
+function addInsideProcess() {
+
+    const container =
+        document.getElementById("insideProcessContainer");
+
+    const row =
+        document.createElement("div");
+
+    row.className =
+        "inside-process-row mb-3";
+
+    row.innerHTML = `
+
+        <label>Process Type</label>
+
+        <div class="input-group">
+
+            <select
+                class="form-control"
+                name="inside_process">
+
+                <option value="">Select</option>
+                <option>UV</option>
+                <option>Matte Lamination</option>
+                <option>UV+Matte Lamination</option>
+                <option>Drip-Off</option>
+                <option>Glossy Lamination</option>
+                <option>Emboss</option>
+                <option>Other</option>
+
+            </select>
+
+            <button
+                type="button"
+                class="btn btn-danger"
+                onclick="this.closest('.inside-process-row').remove()">
+
+                −
+
+            </button>
+
+        </div>
+
+    `;
+
+    container.appendChild(row);
+}
+
+</script>
+
 {% endblock %}
+```

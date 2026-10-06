@@ -1,0 +1,328 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+
+.report-orders-page {
+    padding: 10px 5px 40px;
+}
+
+.report-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+}
+
+.report-top h1 {
+    margin: 0;
+    color: #241b35;
+    font-size: 28px;
+}
+
+.report-top p {
+    margin: 5px 0 0;
+    color: #756b82;
+    font-size: 14px;
+}
+
+.back-btn,
+.excel-btn {
+    display: inline-block;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.back-btn {
+    background: #eee8f6;
+    color: #7250a8;
+}
+
+.excel-btn {
+    background: #7250a8;
+    color: white;
+}
+
+.order-count {
+    background: #f5f1fa;
+    color: #7250a8;
+    padding: 13px 16px;
+    border-radius: 12px;
+    margin-bottom: 18px;
+    font-weight: 700;
+}
+
+.orders-wrapper {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 5px 20px rgba(48,34,66,0.10);
+    overflow-x: auto;
+}
+
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1000px;
+}
+
+.orders-table th {
+    background: #7250a8;
+    color: white;
+    padding: 13px 12px;
+    text-align: left;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.orders-table td {
+    padding: 13px 12px;
+    border-bottom: 1px solid #eee8f4;
+    color: #3d3448;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.orders-table tr:hover td {
+    background: #faf8fc;
+}
+
+.status {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 7px;
+    background: #eee8f6;
+    color: #7250a8;
+    font-weight: 700;
+    font-size: 11px;
+}
+
+.view-order {
+    display: inline-block;
+    text-decoration: none;
+    padding: 6px 10px;
+    border-radius: 7px;
+    background: #7250a8;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.no-orders {
+    text-align: center;
+    padding: 50px 20px;
+    color: #756b82;
+}
+
+@media (max-width: 600px) {
+
+    .report-top h1 {
+        font-size: 23px;
+    }
+
+}
+
+</style>
+
+<div class="report-orders-page">
+
+```
+<!-- HEADER -->
+
+<div class="report-top">
+
+    <div>
+
+        <h1>
+            📊 {{ title }}
+        </h1>
+
+        <p>
+            Report for {{ month }}/{{ year }}
+        </p>
+
+    </div>
+
+
+    <div>
+
+        <a
+            href="{{ url_for(
+                'reports',
+                month=month,
+                year=year
+            ) }}"
+            class="back-btn"
+        >
+            ← Back to Reports
+        </a>
+
+
+        <a
+            href="{{ url_for(
+                'reports_export',
+                month=month,
+                year=year,
+                type=report_type
+            ) }}"
+            class="excel-btn"
+        >
+            ⬇ Download Excel
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- COUNT -->
+
+<div class="order-count">
+
+    Showing
+    <strong>{{ orders|length }}</strong>
+    order(s)
+
+</div>
+
+
+<!-- ORDERS -->
+
+{% if orders %}
+
+<div class="orders-wrapper">
+
+    <table class="orders-table">
+
+        <thead>
+
+            <tr>
+
+                <th>Order No</th>
+
+                <th>Client Name</th>
+
+                <th>Mobile</th>
+
+                <th>Product</th>
+
+                <th>Size</th>
+
+                <th>Quantity</th>
+
+                <th>Designer</th>
+
+                <th>Order Date</th>
+
+                <th>Delivery Date</th>
+
+                <th>Status</th>
+
+                <th>Action</th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            {% for order in orders %}
+
+            <tr>
+
+                <td>
+                    {{ order.order_no or '-' }}
+                </td>
+
+                <td>
+                    {{ order.client_name or '-' }}
+                </td>
+
+                <td>
+                    {{ order.mobile or '-' }}
+                </td>
+
+                <td>
+                    {{ order.product or '-' }}
+                </td>
+
+                <td>
+                    {{ order.size or '-' }}
+                </td>
+
+                <td>
+                    {{ order.quantity or 0 }}
+                </td>
+
+                <td>
+                    {{ order.staff_name or '-' }}
+                </td>
+
+                <td>
+                    {{ order.order_date or '-' }}
+                </td>
+
+                <td>
+                    {{ order.delivery_date or '-' }}
+                </td>
+
+                <td>
+
+                    <span class="status">
+                        {{ order.status or '-' }}
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <a
+                        href="{{ url_for(
+                            'order_detail',
+                            id=order.id
+                        ) }}"
+                        class="view-order"
+                    >
+                        View
+                    </a>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% else %}
+
+<div class="orders-wrapper">
+
+    <div class="no-orders">
+
+        <h3>No Orders Found</h3>
+
+        <p>
+            There are no orders for this report.
+        </p>
+
+    </div>
+
+</div>
+
+{% endif %}
+```
+
+</div>
+
+{% endblock %}

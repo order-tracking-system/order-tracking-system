@@ -1,6 +1,60 @@
+```html
 {% extends 'base.html' %}
 
 {% block content %}
+
+<style>
+
+.dashboard-card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 5px 18px rgba(0,0,0,0.08);
+}
+
+.order-card {
+    border: 1px solid #eeeeee;
+    border-radius: 12px;
+}
+
+.card-number {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.card-orange {
+    color: #f59e0b;
+}
+
+.card-blue {
+    color: #2563eb;
+}
+
+.card-green {
+    color: #16a34a;
+}
+
+.card-purple {
+    color: #7250a8;
+}
+
+.btn-purple {
+    background: #7250a8;
+    color: white;
+    border: none;
+}
+
+.btn-purple:hover {
+    background: #60418f;
+    color: white;
+}
+
+.section-title {
+    font-weight: 700;
+}
+
+</style>
+
 
 <h2 class="mb-4">
     👋 Welcome {{ username }}
@@ -16,6 +70,37 @@
 ================================ -->
 
 <div class="row g-4 mb-5">
+
+
+    <!-- DESIGN -->
+
+    <div class="col-md-3">
+
+        <a href="#design"
+           style="text-decoration:none; color:inherit;">
+
+            <div class="card dashboard-card">
+
+                <div class="card-body">
+
+                    <div class="card-number card-purple">
+                        {{ design_orders|length }}
+                    </div>
+
+                    <p>Design</p>
+
+                    <small class="text-muted">
+                        New orders in design
+                    </small>
+
+                </div>
+
+            </div>
+
+        </a>
+
+    </div>
+
 
     <!-- JOB CARD -->
 
@@ -107,7 +192,14 @@
     </div>
 
 
-    <!-- READY DISPATCH -->
+</div>
+
+
+<!-- ==============================
+     READY DISPATCH CARD
+================================ -->
+
+<div class="row g-4 mb-5">
 
     <div class="col-md-3">
 
@@ -140,6 +232,91 @@
 
 
 <!-- ==============================
+     DESIGN ORDERS
+================================ -->
+
+<div class="card dashboard-card mb-4"
+     id="design">
+
+    <div class="card-header bg-white border-0 pt-4 ps-4">
+
+        <h5 class="section-title">
+            🎨 Design Orders
+        </h5>
+
+    </div>
+
+    <div class="card-body">
+
+        {% if design_orders %}
+
+            {% for order in design_orders %}
+
+            <div class="card order-card mb-3">
+
+                <div class="card-body">
+
+                    <div class="row align-items-center">
+
+                        <div class="col-md-2">
+                            <b>#{{ order.order_no }}</b>
+                        </div>
+
+                        <div class="col-md-3">
+                            <b>Client:</b><br>
+                            {{ order.client_name }}
+                        </div>
+
+                        <div class="col-md-2">
+                            <b>Product:</b><br>
+                            {{ order.product }}
+                        </div>
+
+                        <div class="col-md-2">
+                            <b>Quantity:</b><br>
+                            {{ order.quantity }}
+                        </div>
+
+                        <div class="col-md-3 text-end">
+
+                            <a href="/order/{{ order.id }}"
+                               class="btn btn-purple">
+
+                                View Order
+
+                            </a>
+
+                            <a href="/update/{{ order.id }}/Job%20Card"
+                               class="btn btn-warning">
+
+                                Move to Job Card
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p class="text-muted">
+                No Design orders.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- ==============================
      JOB CARD ORDERS
 ================================ -->
 
@@ -148,8 +325,8 @@
 
     <div class="card-header bg-white border-0 pt-4 ps-4">
 
-        <h5>
-            Job Card Orders
+        <h5 class="section-title">
+            📋 Job Card Orders
         </h5>
 
     </div>
@@ -233,8 +410,8 @@
 
     <div class="card-header bg-white border-0 pt-4 ps-4">
 
-        <h5>
-            Printing Orders
+        <h5 class="section-title">
+            🖨️ Printing Orders
         </h5>
 
     </div>
@@ -318,8 +495,8 @@
 
     <div class="card-header bg-white border-0 pt-4 ps-4">
 
-        <h5>
-            Packing Orders
+        <h5 class="section-title">
+            📦 Packing Orders
         </h5>
 
     </div>
@@ -403,8 +580,8 @@
 
     <div class="card-header bg-white border-0 pt-4 ps-4">
 
-        <h5>
-            Ready for Dispatch
+        <h5 class="section-title">
+            🚚 Ready for Dispatch
         </h5>
 
     </div>
@@ -487,3 +664,4 @@
 </a>
 
 {% endblock %}
+```
