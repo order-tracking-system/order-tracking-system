@@ -1,8 +1,11 @@
-from sqlalchemy import func, extract
-from datetime import datetime
-from flask import Flask, render_template, request, redirect, session
+from sqlalchemy import func
+from datetime import datetime, date
+from flask import Flask, render_template, request, redirect, session, send_file
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import inspect, text
+from io import BytesIO
 import os
+import openpyxl
 
 
 app = Flask(__name__)
@@ -10,9 +13,9 @@ app = Flask(__name__)
 app.secret_key = "erp_secret_key_2026"
 
 
-# ==============================
+# ==================================================
 # DATABASE
-# ==============================
+# ==================================================
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
@@ -24,13 +27,8 @@ if DATABASE_URL:
     )
 
 app.config["SQLALCHEMY_DATABASE_URI"] = (
-    DATABASE_URL or "sqlite:///" + os.path.join(
-        app.root_path,
-        "database.db"
-    )
-)
-app.config["SQLALCHEMY_DATABASE_URI"] = (
-    DATABASE_URL or "sqlite:///" + os.path.join(
+    DATABASE_URL
+    or "sqlite:///" + os.path.join(
         app.root_path,
         "database.db"
     )
@@ -39,6 +37,12 @@ app.config["SQLALCHEMY_DATABASE_URI"] = (
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
+
+
+# ==================================================
+# CUSTOMER MODEL
+# ==================================================
+
 class Customer(db.Model):
 
     id = db.Column(
@@ -60,9 +64,9 @@ class Customer(db.Model):
     )
 
 
-# ==============================
+# ==================================================
 # USER MODEL
-# ==============================
+# ==================================================
 
 class User(db.Model):
 
@@ -93,9 +97,9 @@ class User(db.Model):
     )
 
 
-# ==============================
+# ==================================================
 # ORDER MODEL
-# ==============================
+# ==================================================
 
 class Order(db.Model):
 
@@ -128,6 +132,10 @@ class Order(db.Model):
         db.Integer
     )
 
+    # -----------------------------
+    # INSIDE PRINTING
+    # -----------------------------
+
     inside_process = db.Column(
         db.String(50)
     )
@@ -140,19 +148,26 @@ class Order(db.Model):
         db.String(50)
     )
 
+    # -----------------------------
+    # OUTSIDE PRINTING
+    # -----------------------------
+
     outside_process = db.Column(
         db.String(50)
     )
 
-    order_date = db.Column(db.Date)
-
     outside_gsm = db.Column(
         db.String(50)
     )
+
     outside_color = db.Column(
         db.String(50)
     )
-    # This stores designer username
+
+    # -----------------------------
+    # DESIGNER
+    # -----------------------------
+
     staff_name = db.Column(
         db.String(100)
     )
@@ -161,6 +176,10 @@ class Order(db.Model):
         db.Text
     )
 
+    # -----------------------------
+    # DATES
+    # -----------------------------
+
     order_date = db.Column(
         db.Date
     )
@@ -168,6 +187,19 @@ class Order(db.Model):
     delivery_date = db.Column(
         db.String(50)
     )
+
+    completed_date = db.Column(
+        db.Date,
+        nullable=True
+    )
+
+    dispatch_date = db.Column(
+        db.String(50)
+    )
+
+    # -----------------------------
+    # DISPATCH
+    # -----------------------------
 
     transport_name = db.Column(
         db.String(100)
@@ -181,38 +213,99 @@ class Order(db.Model):
         db.String(100)
     )
 
-    dispatch_date = db.Column(
-        db.String(50)
-    )
+    # -----------------------------
+    # STATUS
+    # -----------------------------
 
     status = db.Column(
         db.String(50)
     )
 
-    # Financial information
+    # -----------------------------
+    # FINANCIAL
+    # -----------------------------
+
     amount = db.Column(
         db.Float,
         default=0
     )
 
-    # Date when order became Delivered
-    completed_date = db.Column(
-        db.Date,
-        nullable=True
-    )
+
+# ==================================================
+# DATABASE SETUP / SAFE MIGRATION
+# ==================================================
+
+with app.app_context():
+
+    db.create_all()
+
+    try:
+
+        inspector = inspect(db.engine)
+
+        tables = inspector.get_table_names()
+
+        if "order" in tables:
+
+            columns = [
+                column["name"]
+                for column in inspector.get_columns("order")
+            ]
+
+            # ------------------------------------------
+            # ADD completed_date IF MISSING
+            # ------------------------------------------
+
+            if "completed_date" not in columns:
+
+                if db.engine.url.drivername.startswith("sqlite"):
+
+                    db.session.execute(
+                        text(
+                            'ALTER TABLE "order" '
+                            'ADD COLUMN completed_date DATE'
+                        )
+                    )
+
+                else:
+
+                    db.session.execute(
+                        text(
+                            'ALTER TABLE "order" '
+                            'ADD COLUMN IF NOT EXISTS completed_date DATE'
+                        )
+                    )
+
+                db.session.commit()
+
+    except Exception as e:
+
+        db.session.rollback()
+
+        print(
+            "DATABASE MIGRATION ERROR:",
+            e
+        )
 
 
-# ==============================
+# ==================================================
 # LOGIN
-# ==============================
+# ==================================================
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 
     if request.method == 'POST':
 
-        username = request.form['username']
-        password = request.form['password']
+        username = request.form.get(
+            'username',
+            ''
+        ).strip()
+
+        password = request.form.get(
+            'password',
+            ''
+        )
 
         user = User.query.filter_by(
             username=username,
@@ -226,21 +319,28 @@ def login():
             session['role'] = user.role
 
             if user.role == 'production':
-                return redirect('/production-dashboard')
 
-            return redirect('/dashboard')
+                return redirect(
+                    '/production-dashboard'
+                )
+
+            return redirect(
+                '/dashboard'
+            )
 
         return render_template(
             'login.html',
             error="Invalid Username or Password"
         )
 
-    return render_template('login.html')
+    return render_template(
+        'login.html'
+    )
 
 
-# ==============================
+# ==================================================
 # LOGOUT
-# ==============================
+# ==================================================
 
 @app.route('/logout')
 def logout():
@@ -250,11 +350,14 @@ def logout():
     return redirect('/login')
 
 
-# ==============================
+# ==================================================
 # CUSTOMER REGISTER
-# ==============================
+# ==================================================
 
-@app.route('/customer-register', methods=['GET', 'POST'])
+@app.route(
+    '/customer-register',
+    methods=['GET', 'POST']
+)
 def customer_register():
 
     if request.method == 'POST':
@@ -266,21 +369,25 @@ def customer_register():
         )
 
         db.session.add(customer)
-
         db.session.commit()
 
-        return redirect('/customer-login')
+        return redirect(
+            '/customer-login'
+        )
 
     return render_template(
         'customer_register.html'
     )
 
 
-# ==============================
+# ==================================================
 # CUSTOMER LOGIN
-# ==============================
+# ==================================================
 
-@app.route('/customer-login', methods=['GET', 'POST'])
+@app.route(
+    '/customer-login',
+    methods=['GET', 'POST']
+)
 def customer_login():
 
     if request.method == 'POST':
@@ -298,107 +405,156 @@ def customer_login():
 
             session['customer_id'] = customer.id
 
-            return redirect('/customer-dashboard')
+            return redirect(
+                '/customer-dashboard'
+            )
 
     return render_template(
         'customer_login.html'
     )
 
 
-# ==============================
+# ==================================================
 # HOME
-# ==============================
+# ==================================================
 
 @app.route('/')
 def home():
 
     if 'user' in session:
 
-        return redirect('/dashboard')
+        return redirect(
+            '/dashboard'
+        )
 
-    return redirect('/login')
+    return redirect(
+        '/login'
+    )
 
 
-# ==============================
+# ==================================================
 # ADD ORDER
-# ==============================
+# ==================================================
 
-@app.route('/add', methods=['GET', 'POST'])
+@app.route(
+    '/add',
+    methods=['GET', 'POST']
+)
 def add_order():
 
     if 'user_id' not in session:
 
         return redirect('/login')
 
-    # Get all designers
     designers = User.query.filter_by(
         role='designer'
     ).all()
 
     if request.method == 'POST':
 
-        order_no = (
-            "ORD" +
-            str(Order.query.count() + 1)
+        last_order = Order.query.order_by(
+            Order.id.desc()
+        ).first()
+
+        if last_order:
+
+            order_no = "ORD" + str(
+                last_order.id + 1
+            )
+
+        else:
+
+            order_no = "ORD1"
+
+        order_date_value = request.form.get(
+            'order_date'
         )
+
+        if order_date_value:
+
+            order_date_value = datetime.strptime(
+                order_date_value,
+                "%Y-%m-%d"
+            ).date()
+
+        else:
+
+            order_date_value = date.today()
+
+        quantity_value = request.form.get(
+            'quantity',
+            '0'
+        )
+
+        try:
+
+            quantity_value = int(
+                quantity_value or 0
+            )
+
+        except ValueError:
+
+            quantity_value = 0
 
         order = Order(
 
             order_no=order_no,
 
-            client_name=request.form['client_name'],
-
-            mobile=request.form['mobile'],
-
-            product=request.form['product'],
-
-            size=request.form['size'],
-
-            quantity=int(
-                request.form['quantity'] or 0
+            client_name=request.form.get(
+                'client_name'
             ),
 
-            inside_process=request.form[
+            mobile=request.form.get(
+                'mobile'
+            ),
+
+            product=request.form.get(
+                'product'
+            ),
+
+            size=request.form.get(
+                'size'
+            ),
+
+            quantity=quantity_value,
+
+            inside_process=request.form.get(
                 'inside_process'
-            ],
+            ),
 
-            inside_gsm=request.form[
+            inside_gsm=request.form.get(
                 'inside_gsm'
-            ],
+            ),
 
-            inside_color=request.form[
+            inside_color=request.form.get(
                 'inside_color'
-            ],
+            ),
 
-            outside_process=request.form[
+            outside_process=request.form.get(
                 'outside_process'
-            ],
+            ),
 
-            outside_gsm=request.form[
+            outside_gsm=request.form.get(
                 'outside_gsm'
-            ],
+            ),
 
-            outside_color=request.form[
+            outside_color=request.form.get(
                 'outside_color'
-            ],
+            ),
 
-            # Designer assignment
-            staff_name=request.form[
+            staff_name=request.form.get(
                 'staff_name'
-            ],
+            ),
 
-            remarks=request.form[
+            remarks=request.form.get(
                 'remarks'
-            ],
+            ),
 
-            order_date=datetime.strptime(
-                request.form['order_date'],
-                "%Y-%m-%d"
-            ).date(),
+            order_date=order_date_value,
 
-            delivery_date=request.form[
+            delivery_date=request.form.get(
                 'delivery_date'
-            ],
+            ),
 
             status='Design',
 
@@ -406,10 +562,11 @@ def add_order():
         )
 
         db.session.add(order)
-
         db.session.commit()
 
-        return redirect('/dashboard')
+        return redirect(
+            '/dashboard'
+        )
 
     return render_template(
         'add_order.html',
@@ -418,7 +575,7 @@ def add_order():
 
 
 # ==================================================
-# DESIGNER - MY TOTAL ORDERS
+# DESIGNER - TOTAL ORDERS
 # ==================================================
 
 @app.route('/my-orders')
@@ -432,7 +589,9 @@ def my_orders():
 
         return "Access Denied", 403
 
-    username = session.get('user')
+    username = session.get(
+        'user'
+    )
 
     orders = Order.query.filter_by(
         staff_name=username
@@ -449,7 +608,7 @@ def my_orders():
 
 
 # ==================================================
-# DESIGNER - MY PENDING ORDERS
+# DESIGNER - PENDING ORDERS
 # ==================================================
 
 @app.route('/my-pending-orders')
@@ -463,7 +622,9 @@ def my_pending_orders():
 
         return "Access Denied", 403
 
-    username = session.get('user')
+    username = session.get(
+        'user'
+    )
 
     orders = Order.query.filter(
         Order.staff_name == username,
@@ -481,7 +642,7 @@ def my_pending_orders():
 
 
 # ==================================================
-# DESIGNER - MY COMPLETED ORDERS
+# DESIGNER - COMPLETED ORDERS
 # ==================================================
 
 @app.route('/my-completed-orders')
@@ -495,7 +656,9 @@ def my_completed_orders():
 
         return "Access Denied", 403
 
-    username = session.get('user')
+    username = session.get(
+        'user'
+    )
 
     orders = Order.query.filter(
         Order.staff_name == username,
@@ -512,9 +675,9 @@ def my_completed_orders():
     )
 
 
-# ==============================
+# ==================================================
 # DASHBOARD
-# ==============================
+# ==================================================
 
 @app.route('/dashboard')
 def dashboard():
@@ -523,38 +686,33 @@ def dashboard():
 
         return redirect('/login')
 
-    role = session.get('role')
+    role = session.get(
+        'role'
+    )
 
-    username = session.get('user')
+    username = session.get(
+        'user'
+    )
 
-
-    # OWNER
     if role == 'owner':
 
-        orders = Order.query.all()
+        orders = Order.query.order_by(
+            Order.id.desc()
+        ).all()
 
-
-    # DESIGNER
-    # ONLY THEIR ASSIGNED ORDERS
     elif role == 'designer':
 
         orders = Order.query.filter_by(
             staff_name=username
+        ).order_by(
+            Order.id.desc()
         ).all()
 
-
-    # OTHER STAFF
     else:
 
         orders = []
 
-
-    # ==============================
-    # COUNTS
-    # ==============================
-
     total_orders = len(orders)
-
 
     design = sum(
         1
@@ -562,13 +720,11 @@ def dashboard():
         if order.status == "Design"
     )
 
-
     jobcard = sum(
         1
         for order in orders
         if order.status == "Job Card"
     )
-
 
     printing = sum(
         1
@@ -576,13 +732,11 @@ def dashboard():
         if order.status == "Printing"
     )
 
-
     packing = sum(
         1
         for order in orders
         if order.status == "Packing"
     )
-
 
     dispatched = sum(
         1
@@ -590,21 +744,15 @@ def dashboard():
         if order.status == "Dispatched"
     )
 
-
     completed = sum(
         1
         for order in orders
         if order.status == "Delivered"
     )
 
-
-    pending = total_orders - completed
-
-
-    # ==============================
-    # FINANCIAL INFORMATION
-    # ONLY OWNER
-    # ==============================
+    pending = (
+        total_orders - completed
+    )
 
     if role == 'owner':
 
@@ -616,7 +764,6 @@ def dashboard():
     else:
 
         total_revenue = 0
-
 
     return render_template(
 
@@ -648,83 +795,91 @@ def dashboard():
     )
 
 
-# ==============================
+# ==================================================
 # EDIT ORDER
-# ==============================
+# ==================================================
 
-@app.route('/edit/<int:id>', methods=['GET', 'POST'])
+@app.route(
+    '/edit/<int:id>',
+    methods=['GET', 'POST']
+)
 def edit_order(id):
 
-    if 'user' not in session:
+    if 'user_id' not in session:
 
         return redirect('/login')
 
     order = Order.query.get_or_404(id)
 
-
     if request.method == 'POST':
 
-        order.client_name = request.form[
+        order.client_name = request.form.get(
             'client_name'
-        ]
+        )
 
-        order.mobile = request.form[
+        order.mobile = request.form.get(
             'mobile'
-        ]
+        )
 
-        order.product = request.form[
+        order.product = request.form.get(
             'product'
-        ]
+        )
 
-        order.size = request.form[
+        order.size = request.form.get(
             'size'
-        ]
+        )
 
-        order.quantity = request.form[
-            'quantity'
-        ]
+        try:
 
+            order.quantity = int(
+                request.form.get(
+                    'quantity',
+                    0
+                )
+            )
 
-        order.inside_process = request.form[
+        except ValueError:
+
+            order.quantity = 0
+
+        order.inside_process = request.form.get(
             'inside_process'
-        ]
+        )
 
-        order.inside_gsm = request.form[
+        order.inside_gsm = request.form.get(
             'inside_gsm'
-        ]
+        )
 
-        order.inside_color = request.form[
+        order.inside_color = request.form.get(
             'inside_color'
-        ]
+        )
 
-
-        order.outside_process = request.form[
+        order.outside_process = request.form.get(
             'outside_process'
-        ]
+        )
 
-        order.outside_gsm = request.form[
+        order.outside_gsm = request.form.get(
             'outside_gsm'
-        ]
+        )
 
-        order.outside_color = request.form[
+        order.outside_color = request.form.get(
             'outside_color'
-        ]
+        )
 
-
-        order.staff_name = request.form[
+        order.staff_name = request.form.get(
             'staff_name'
-        ]
+        )
 
-        order.remarks = request.form[
+        order.remarks = request.form.get(
             'remarks'
-        ]
+        )
 
+        if request.form.get('order_date'):
 
-        order.order_date = datetime.strptime(
-            request.form['order_date'],
-            "%Y-%m-%d"
-        ).date()
-
+            order.order_date = datetime.strptime(
+                request.form['order_date'],
+                "%Y-%m-%d"
+            ).date()
 
         db.session.commit()
 
@@ -732,21 +887,20 @@ def edit_order(id):
             '/order/' + str(id)
         )
 
-
     return render_template(
         'edit_order.html',
         order=order
     )
 
 
-# ==============================
+# ==================================================
 # DELETE ORDER
-# ==============================
+# ==================================================
 
 @app.route('/delete/<int:id>')
 def delete_order(id):
 
-    if 'user' not in session:
+    if 'user_id' not in session:
 
         return redirect('/login')
 
@@ -756,14 +910,18 @@ def delete_order(id):
 
     db.session.commit()
 
-    return redirect('/dashboard')
+    return redirect(
+        '/dashboard'
+    )
 
 
-# ==============================
+# ==================================================
 # UPDATE ORDER STATUS
-# ==============================
+# ==================================================
 
-@app.route('/update/<int:id>/<status>')
+@app.route(
+    '/update/<int:id>/<status>'
+)
 def update_status(id, status):
 
     if 'user_id' not in session:
@@ -776,43 +934,23 @@ def update_status(id, status):
 
     username = session.get('user')
 
-
-    # ==============================
-    # DESIGNER SECURITY
-    # ==============================
-
     if role == 'designer':
 
-        # Only own order
         if order.staff_name != username:
 
             return "Access Denied", 403
 
-
-        # Designer can only move
-        # Design -> Job Card
         if status != "Job Card":
 
             return "Access Denied", 403
 
-
-    # ==============================
-    # UPDATE STATUS
-    # ==============================
-
     order.status = status
-
-
-    # ==============================
-    # COMPLETION DATE
-    # ==============================
 
     if status == "Delivered":
 
         order.completed_date = (
             datetime.now().date()
         )
-
 
     db.session.commit()
 
@@ -821,9 +959,9 @@ def update_status(id, status):
     )
 
 
-# ==============================
+# ==================================================
 # SEARCH
-# ==============================
+# ==================================================
 
 @app.route('/search')
 def search():
@@ -837,22 +975,23 @@ def search():
         ''
     )
 
+    role = session.get(
+        'role'
+    )
 
-    role = session.get('role')
+    username = session.get(
+        'user'
+    )
 
-    username = session.get('user')
-
-
-    # OWNER SEARCH
     if role == 'owner':
 
         orders = Order.query.filter(
             (Order.order_no.contains(q)) |
             (Order.client_name.contains(q))
+        ).order_by(
+            Order.id.desc()
         ).all()
 
-
-    # DESIGNER SEARCH
     elif role == 'designer':
 
         orders = Order.query.filter(
@@ -861,58 +1000,45 @@ def search():
                 Order.order_no.contains(q) |
                 Order.client_name.contains(q)
             )
+        ).order_by(
+            Order.id.desc()
         ).all()
-
 
     else:
 
         orders = []
 
-
     design = sum(
-        1
-        for o in orders
+        1 for o in orders
         if o.status == "Design"
     )
 
-
     jobcard = sum(
-        1
-        for o in orders
+        1 for o in orders
         if o.status == "Job Card"
     )
 
-
     printing = sum(
-        1
-        for o in orders
+        1 for o in orders
         if o.status == "Printing"
     )
 
-
     packing = sum(
-        1
-        for o in orders
+        1 for o in orders
         if o.status == "Packing"
     )
 
-
     dispatched = sum(
-        1
-        for o in orders
+        1 for o in orders
         if o.status == "Dispatched"
     )
 
-
     completed = sum(
-        1
-        for o in orders
+        1 for o in orders
         if o.status == "Delivered"
     )
 
-
     pending = len(orders) - completed
-
 
     return render_template(
 
@@ -944,11 +1070,14 @@ def search():
     )
 
 
-# ==============================
+# ==================================================
 # DISPATCH
-# ==============================
+# ==================================================
 
-@app.route('/dispatch/<int:id>', methods=['GET', 'POST'])
+@app.route(
+    '/dispatch/<int:id>',
+    methods=['GET', 'POST']
+)
 def dispatch(id):
 
     if 'user_id' not in session:
@@ -957,27 +1086,25 @@ def dispatch(id):
 
     order = Order.query.get_or_404(id)
 
-
     if request.method == 'POST':
 
-        order.transport_name = request.form[
+        order.transport_name = request.form.get(
             'transport_name'
-        ]
+        )
 
-        order.lr_number = request.form[
+        order.lr_number = request.form.get(
             'lr_number'
-        ]
+        )
 
-        order.invoice_number = request.form[
+        order.invoice_number = request.form.get(
             'invoice_number'
-        ]
+        )
 
-        order.dispatch_date = request.form[
+        order.dispatch_date = request.form.get(
             'dispatch_date'
-        ]
+        )
 
         order.status = "Dispatched"
-
 
         db.session.commit()
 
@@ -985,22 +1112,28 @@ def dispatch(id):
             '/order/' + str(id)
         )
 
-
     return render_template(
         'dispatch.html',
         order=order
     )
-# ==============================
+
+
+# ==================================================
 # PRODUCTION DASHBOARD
-# ==============================
+# ==================================================
 
 @app.route('/production-dashboard')
 def production_dashboard():
 
     if 'user_id' not in session:
+
         return redirect('/login')
 
-    if session.get('role') not in ['production', 'owner']:
+    if session.get('role') not in [
+        'production',
+        'owner'
+    ]:
+
         return "Access Denied", 403
 
     jobcard_orders = Order.query.filter_by(
@@ -1028,27 +1161,32 @@ def production_dashboard():
     ).all()
 
     return render_template(
+
         'production_dashboard.html',
+
         jobcard_orders=jobcard_orders,
+
         printing_orders=printing_orders,
+
         packing_orders=packing_orders,
+
         ready_dispatch_orders=ready_dispatch_orders,
+
         username=session.get('user'),
+
         role=session.get('role')
     )
 
-# ==============================
-# PRODUCTION BOARD
-# ==============================
 
-# ==============================
+# ==================================================
 # PRODUCTION BOARD
-# ==============================
+# ==================================================
 
 @app.route('/production-board')
 def production_board():
 
     if 'user_id' not in session:
+
         return redirect('/login')
 
     design_orders = Order.query.filter_by(
@@ -1076,27 +1214,39 @@ def production_board():
     ).all()
 
     dispatch_orders = Order.query.filter(
-        Order.status.in_(["Ready Dispatch", "Dispatched"])
+        Order.status.in_(
+            [
+                "Ready Dispatch",
+                "Dispatched"
+            ]
+        )
     ).order_by(
         Order.id.desc()
     ).all()
 
     return render_template(
+
         'production_board.html',
 
         design_orders=design_orders,
+
         jobcard_orders=jobcard_orders,
+
         printing_orders=printing_orders,
+
         packing_orders=packing_orders,
+
         dispatch_orders=dispatch_orders,
 
         username=session.get('user'),
+
         role=session.get('role')
     )
 
-# ==============================
-# REPORTS
-# ==============================
+
+# ==================================================
+# REPORTS DASHBOARD
+# ==================================================
 
 @app.route('/reports')
 def reports():
@@ -1105,13 +1255,11 @@ def reports():
 
         return redirect('/login')
 
-
     month = request.args.get(
         "month",
         datetime.now().month,
         type=int
     )
-
 
     year = request.args.get(
         "year",
@@ -1119,67 +1267,152 @@ def reports():
         type=int
     )
 
+    if month < 1 or month > 12:
 
-    total_orders = Order.query.count()
+        month = datetime.now().month
 
+    # -----------------------------
+    # DATE RANGE
+    # -----------------------------
 
-    delivered = Order.query.filter_by(
-        status="Delivered"
-    ).count()
+    start_date = datetime(
+        year,
+        month,
+        1
+    ).date()
 
+    if month == 12:
 
-    dispatched = Order.query.filter_by(
-        status="Dispatched"
-    ).count()
+        end_date = datetime(
+            year + 1,
+            1,
+            1
+        ).date()
 
+    else:
 
-    pending = total_orders - delivered
+        end_date = datetime(
+            year,
+            month + 1,
+            1
+        ).date()
 
+    # -----------------------------
+    # MONTH ORDERS
+    # -----------------------------
 
-    staff_report = db.session.query(
-
-        Order.staff_name,
-
-        func.count(Order.id)
-
-    ).filter(
-
-        extract(
-            'month',
-            Order.order_date
-        ) == month,
-
-        extract(
-            'year',
-            Order.order_date
-        ) == year
-
-    ).group_by(
-
-        Order.staff_name
-
+    orders = Order.query.filter(
+        Order.order_date >= start_date,
+        Order.order_date < end_date
     ).order_by(
-
-        func.count(
-            Order.id
-        ).desc()
-
+        Order.id.desc()
     ).all()
 
+    # -----------------------------
+    # COUNTS
+    # -----------------------------
+
+    total_orders = len(orders)
+
+    pending = sum(
+        1
+        for order in orders
+        if order.status != "Delivered"
+    )
+
+    delivered = sum(
+        1
+        for order in orders
+        if order.status == "Delivered"
+    )
+
+    ready_dispatch = sum(
+        1
+        for order in orders
+        if order.status == "Ready Dispatch"
+    )
+
+    complete_ready = (
+        delivered + ready_dispatch
+    )
+
+    design = sum(
+        1
+        for order in orders
+        if order.status == "Design"
+    )
+
+    jobcard = sum(
+        1
+        for order in orders
+        if order.status == "Job Card"
+    )
+
+    printing = sum(
+        1
+        for order in orders
+        if order.status == "Printing"
+    )
+
+    packing = sum(
+        1
+        for order in orders
+        if order.status == "Packing"
+    )
+
+    clipping = sum(
+        1
+        for order in orders
+        if order.status == "Clipping"
+    )
+
+    # PROCESS =
+    # Job Card + Printing + Packing + Clipping
+
+    process = sum(
+        1
+        for order in orders
+        if order.status in [
+            "Job Card",
+            "Printing",
+            "Packing",
+            "Clipping"
+        ]
+    )
+
+    dispatched = sum(
+        1
+        for order in orders
+        if order.status == "Dispatched"
+    )
 
     return render_template(
 
-        "reports.html",
+        'reports.html',
 
         total_orders=total_orders,
 
-        delivered=delivered,
-
-        dispatched=dispatched,
-
         pending=pending,
 
-        staff_report=staff_report,
+        delivered=delivered,
+
+        ready_dispatch=ready_dispatch,
+
+        complete_ready=complete_ready,
+
+        process=process,
+
+        design=design,
+
+        jobcard=jobcard,
+
+        printing=printing,
+
+        packing=packing,
+
+        clipping=clipping,
+
+        dispatched=dispatched,
 
         month=month,
 
@@ -1187,9 +1420,593 @@ def reports():
     )
 
 
-# ==============================
+# ==================================================
+# REPORT ORDERS
+# ==================================================
+
+@app.route('/reports/orders')
+def report_orders():
+
+    if 'user' not in session:
+
+        return redirect('/login')
+
+    month = request.args.get(
+        "month",
+        datetime.now().month,
+        type=int
+    )
+
+    year = request.args.get(
+        "year",
+        datetime.now().year,
+        type=int
+    )
+
+    report_type = request.args.get(
+        "type",
+        "total"
+    )
+
+    report_type = report_type.lower().strip()
+
+    # -----------------------------
+    # TYPE ALIASES
+    # -----------------------------
+
+    if report_type == "all":
+
+        report_type = "total"
+
+    type_aliases = {
+
+        "design": "design",
+
+        "job card": "jobcard",
+
+        "jobcard": "jobcard",
+
+        "printing": "printing",
+
+        "packing": "packing",
+
+        "clipping": "clipping",
+
+        "ready dispatch": "ready_dispatch",
+
+        "ready_dispatch": "ready_dispatch",
+
+        "dispatched": "dispatched",
+
+        "delivered": "delivered",
+
+        "pending": "pending",
+
+        "complete_ready": "complete_ready",
+
+        "process": "process"
+    }
+
+    report_type = type_aliases.get(
+        report_type,
+        report_type
+    )
+
+    # -----------------------------
+    # DATE RANGE
+    # -----------------------------
+
+    start_date = datetime(
+        year,
+        month,
+        1
+    ).date()
+
+    if month == 12:
+
+        end_date = datetime(
+            year + 1,
+            1,
+            1
+        ).date()
+
+    else:
+
+        end_date = datetime(
+            year,
+            month + 1,
+            1
+        ).date()
+
+    # -----------------------------
+    # MONTH ORDERS
+    # -----------------------------
+
+    orders = Order.query.filter(
+        Order.order_date >= start_date,
+        Order.order_date < end_date
+    ).order_by(
+        Order.id.desc()
+    ).all()
+
+    # -----------------------------
+    # FILTER
+    # -----------------------------
+
+    if report_type == "pending":
+
+        orders = [
+            order
+            for order in orders
+            if order.status != "Delivered"
+        ]
+
+    elif report_type == "delivered":
+
+        orders = [
+            order
+            for order in orders
+            if order.status == "Delivered"
+        ]
+
+    elif report_type == "complete_ready":
+
+        orders = [
+            order
+            for order in orders
+            if order.status in [
+                "Delivered",
+                "Ready Dispatch"
+            ]
+        ]
+
+    elif report_type == "process":
+
+        orders = [
+            order
+            for order in orders
+            if order.status in [
+                "Job Card",
+                "Printing",
+                "Packing",
+                "Clipping"
+            ]
+        ]
+
+    elif report_type == "design":
+
+        orders = [
+            order
+            for order in orders
+            if order.status == "Design"
+        ]
+
+    elif report_type == "jobcard":
+
+        orders = [
+            order
+            for order in orders
+            if order.status == "Job Card"
+        ]
+
+    elif report_type == "printing":
+
+        orders = [
+            order
+            for order in orders
+            if order.status == "Printing"
+        ]
+
+    elif report_type == "packing":
+
+        orders = [
+            order
+            for order in orders
+            if order.status == "Packing"
+        ]
+
+    elif report_type == "clipping":
+
+        orders = [
+            order
+            for order in orders
+            if order.status == "Clipping"
+        ]
+
+    elif report_type == "ready_dispatch":
+
+        orders = [
+            order
+            for order in orders
+            if order.status == "Ready Dispatch"
+        ]
+
+    elif report_type == "dispatched":
+
+        orders = [
+            order
+            for order in orders
+            if order.status == "Dispatched"
+        ]
+
+    # -----------------------------
+    # TITLES
+    # -----------------------------
+
+    titles = {
+
+        "total": "All Orders",
+
+        "pending": "Pending Orders",
+
+        "delivered": "Completed Orders",
+
+        "complete_ready":
+            "Complete Order / Ready for Dispatch",
+
+        "process":
+            "Process Orders",
+
+        "design":
+            "Design Orders",
+
+        "jobcard":
+            "Job Card Orders",
+
+        "printing":
+            "Printing Orders",
+
+        "packing":
+            "Packing Orders",
+
+        "clipping":
+            "Clipping Orders",
+
+        "ready_dispatch":
+            "Ready Dispatch Orders",
+
+        "dispatched":
+            "Dispatched Orders"
+    }
+
+    title = titles.get(
+        report_type,
+        "Orders"
+    )
+
+    return render_template(
+
+        'report_orders.html',
+
+        orders=orders,
+
+        title=title,
+
+        month=month,
+
+        year=year,
+
+        report_type=report_type
+    )
+
+
+# ==================================================
+# REPORT EXCEL EXPORT
+# ==================================================
+
+def generate_report_export():
+
+    if 'user' not in session:
+
+        return redirect('/login')
+
+    month = request.args.get(
+        "month",
+        datetime.now().month,
+        type=int
+    )
+
+    year = request.args.get(
+        "year",
+        datetime.now().year,
+        type=int
+    )
+
+    report_type = request.args.get(
+        "type",
+        "total"
+    )
+
+    report_type = report_type.lower().strip()
+
+    if report_type == "all":
+
+        report_type = "total"
+
+    type_aliases = {
+
+        "job card": "jobcard",
+
+        "ready dispatch": "ready_dispatch",
+
+        "process": "process"
+    }
+
+    report_type = type_aliases.get(
+        report_type,
+        report_type
+    )
+
+    # -----------------------------
+    # DATE RANGE
+    # -----------------------------
+
+    start_date = datetime(
+        year,
+        month,
+        1
+    ).date()
+
+    if month == 12:
+
+        end_date = datetime(
+            year + 1,
+            1,
+            1
+        ).date()
+
+    else:
+
+        end_date = datetime(
+            year,
+            month + 1,
+            1
+        ).date()
+
+    # -----------------------------
+    # QUERY
+    # -----------------------------
+
+    query = Order.query.filter(
+        Order.order_date >= start_date,
+        Order.order_date < end_date
+    )
+
+    if report_type == "pending":
+
+        query = query.filter(
+            Order.status != "Delivered"
+        )
+
+    elif report_type == "delivered":
+
+        query = query.filter(
+            Order.status == "Delivered"
+        )
+
+    elif report_type == "complete_ready":
+
+        query = query.filter(
+            Order.status.in_([
+                "Delivered",
+                "Ready Dispatch"
+            ])
+        )
+
+    elif report_type == "process":
+
+        query = query.filter(
+            Order.status.in_([
+                "Job Card",
+                "Printing",
+                "Packing",
+                "Clipping"
+            ])
+        )
+
+    elif report_type == "design":
+
+        query = query.filter(
+            Order.status == "Design"
+        )
+
+    elif report_type == "jobcard":
+
+        query = query.filter(
+            Order.status == "Job Card"
+        )
+
+    elif report_type == "printing":
+
+        query = query.filter(
+            Order.status == "Printing"
+        )
+
+    elif report_type == "packing":
+
+        query = query.filter(
+            Order.status == "Packing"
+        )
+
+    elif report_type == "clipping":
+
+        query = query.filter(
+            Order.status == "Clipping"
+        )
+
+    elif report_type == "ready_dispatch":
+
+        query = query.filter(
+            Order.status == "Ready Dispatch"
+        )
+
+    elif report_type == "dispatched":
+
+        query = query.filter(
+            Order.status == "Dispatched"
+        )
+
+    orders = query.order_by(
+        Order.id.desc()
+    ).all()
+
+    # -----------------------------
+    # CREATE EXCEL
+    # -----------------------------
+
+    workbook = openpyxl.Workbook()
+
+    sheet = workbook.active
+
+    sheet.title = "Order Report"
+
+    # -----------------------------
+    # HEADERS
+    # -----------------------------
+
+    headers = [
+
+        "Order No",
+
+        "Client Name",
+
+        "Contact Number",
+
+        "Product",
+
+        "Size",
+
+        "Quantity",
+
+        "Designer",
+
+        "Order Date",
+
+        "Delivery Date",
+
+        "Status",
+
+        "Remarks"
+    ]
+
+    sheet.append(headers)
+
+    # -----------------------------
+    # DATA
+    # -----------------------------
+
+    for order in orders:
+
+        sheet.append([
+
+            order.order_no,
+
+            order.client_name,
+
+            order.mobile,
+
+            order.product,
+
+            order.size,
+
+            order.quantity,
+
+            order.staff_name,
+
+            order.order_date,
+
+            order.delivery_date,
+
+            order.status,
+
+            order.remarks
+        ])
+
+    # -----------------------------
+    # COLUMN WIDTH
+    # -----------------------------
+
+    widths = {
+
+        "A": 15,
+        "B": 25,
+        "C": 18,
+        "D": 20,
+        "E": 15,
+        "F": 12,
+        "G": 18,
+        "H": 15,
+        "I": 15,
+        "J": 20,
+        "K": 35
+    }
+
+    for column, width in widths.items():
+
+        sheet.column_dimensions[
+            column
+        ].width = width
+
+    # -----------------------------
+    # HEADER STYLE
+    # -----------------------------
+
+    for cell in sheet[1]:
+
+        cell.font = openpyxl.styles.Font(
+            bold=True
+        )
+
+        cell.alignment = openpyxl.styles.Alignment(
+            horizontal="center"
+        )
+
+    # -----------------------------
+    # SAVE MEMORY
+    # -----------------------------
+
+    output = BytesIO()
+
+    workbook.save(output)
+
+    output.seek(0)
+
+    filename = (
+
+        f"Order_Report_"
+        f"{year}_"
+        f"{month:02d}_"
+        f"{report_type}.xlsx"
+    )
+
+    return send_file(
+
+        output,
+
+        as_attachment=True,
+
+        download_name=filename,
+
+        mimetype=(
+            "application/vnd.openxmlformats-"
+            "officedocument.spreadsheetml.sheet"
+        )
+    )
+
+
+# ==================================================
+# EXPORT ROUTE
+# ==================================================
+
+@app.route('/reports/export')
+def reports_export():
+
+    return generate_report_export()
+
+
+# ==================================================
 # PUBLIC ORDER TRACKING
-# ==============================
+# ==================================================
 
 @app.route('/track/<order_no>')
 def track(order_no):
@@ -1198,16 +2015,15 @@ def track(order_no):
         order_no=order_no
     ).first_or_404()
 
-
     return render_template(
         'track.html',
         order=order
     )
 
 
-# ==============================
+# ==================================================
 # ORDER DETAIL
-# ==============================
+# ==================================================
 
 @app.route('/order/<int:id>')
 def order_detail(id):
@@ -1216,24 +2032,21 @@ def order_detail(id):
 
         return redirect('/login')
 
-
     order = Order.query.get_or_404(id)
 
-    role = session.get('role')
+    role = session.get(
+        'role'
+    )
 
-    username = session.get('user')
-
-
-    # ==============================
-    # DESIGNER SECURITY
-    # ==============================
+    username = session.get(
+        'user'
+    )
 
     if role == 'designer':
 
         if order.staff_name != username:
 
             return "Access Denied", 403
-
 
     return render_template(
 
@@ -1247,23 +2060,16 @@ def order_detail(id):
     )
 
 
-# ==============================
-# CREATE DATABASE + USERS
-# ==============================
+# ==================================================
+# CREATE DEFAULT USERS
+# ==================================================
 
 with app.app_context():
 
-    db.create_all()
-
-
-    # ==============================
     # OWNER
-    # ==============================
-
     owner = User.query.filter_by(
         username="pingax"
     ).first()
-
 
     if not owner:
 
@@ -1282,15 +2088,10 @@ with app.app_context():
 
         db.session.commit()
 
-
-    # ==============================
     # DESIGNER 1
-    # ==============================
-
     designer1 = User.query.filter_by(
         username="designer1"
     ).first()
-
 
     if not designer1:
 
@@ -1309,15 +2110,10 @@ with app.app_context():
 
         db.session.commit()
 
-
-    # ==============================
     # DESIGNER 2
-    # ==============================
-
     designer2 = User.query.filter_by(
         username="designer2"
     ).first()
-
 
     if not designer2:
 
@@ -1336,15 +2132,10 @@ with app.app_context():
 
         db.session.commit()
 
-
-    # ==============================
     # DESIGNER 3
-    # ==============================
-
     designer3 = User.query.filter_by(
         username="designer3"
     ).first()
-
 
     if not designer3:
 
@@ -1363,10 +2154,7 @@ with app.app_context():
 
         db.session.commit()
 
-# ==============================
-# PRODUCTION STAFF
-# ==============================
-
+    # PRODUCTION
     production1 = User.query.filter_by(
         username="production1"
     ).first()
@@ -1374,17 +2162,24 @@ with app.app_context():
     if not production1:
 
         production1 = User(
+
             name="Production Staff",
+
             username="production1",
+
             password="production@123",
+
             role="production"
         )
 
         db.session.add(production1)
+
         db.session.commit()
-# ==============================
+
+
+# ==================================================
 # RUN APP
-# ==============================
+# ==================================================
 
 if __name__ == '__main__':
 
