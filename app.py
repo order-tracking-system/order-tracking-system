@@ -1155,19 +1155,35 @@ def dispatch(id):
 # PRODUCTION DASHBOARD
 # ==================================================
 
+# ==================================================
+# PRODUCTION DASHBOARD
+# ==================================================
+
 @app.route('/production-dashboard')
 def production_dashboard():
 
     if 'user_id' not in session:
-
         return redirect('/login')
 
     if session.get('role') not in [
         'production',
         'owner'
     ]:
-
         return "Access Denied", 403
+
+    # -----------------------------
+    # DESIGN ORDERS
+    # -----------------------------
+
+    design_orders = Order.query.filter_by(
+        status="Design"
+    ).order_by(
+        Order.id.desc()
+    ).all()
+
+    # -----------------------------
+    # JOB CARD ORDERS
+    # -----------------------------
 
     jobcard_orders = Order.query.filter_by(
         status="Job Card"
@@ -1175,11 +1191,19 @@ def production_dashboard():
         Order.id.desc()
     ).all()
 
+    # -----------------------------
+    # PRINTING ORDERS
+    # -----------------------------
+
     printing_orders = Order.query.filter_by(
         status="Printing"
     ).order_by(
         Order.id.desc()
     ).all()
+
+    # -----------------------------
+    # PACKING ORDERS
+    # -----------------------------
 
     packing_orders = Order.query.filter_by(
         status="Packing"
@@ -1187,15 +1211,24 @@ def production_dashboard():
         Order.id.desc()
     ).all()
 
+    # -----------------------------
+    # READY DISPATCH
+    # -----------------------------
+
     ready_dispatch_orders = Order.query.filter_by(
         status="Ready Dispatch"
     ).order_by(
         Order.id.desc()
     ).all()
 
-    return render_template(
+    # -----------------------------
+    # SHOW DASHBOARD
+    # -----------------------------
 
+    return render_template(
         'production_dashboard.html',
+
+        design_orders=design_orders,
 
         jobcard_orders=jobcard_orders,
 
@@ -1209,7 +1242,6 @@ def production_dashboard():
 
         role=session.get('role')
     )
-
 # ==================================================
 # PRODUCTION BOARD
 # ==================================================
