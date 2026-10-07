@@ -169,11 +169,20 @@ class Order(db.Model):
     # -----------------------------
 
     staff_name = db.Column(
-        db.String(100)
+    db.String(100)
+    )
+
+    order_by = db.Column(
+    db.String(100)
+    )
+
+    rate = db.Column(
+    db.Float,
+    default=0
     )
 
     remarks = db.Column(
-        db.Text
+    db.Text
     )
 
     # -----------------------------
@@ -271,47 +280,57 @@ with app.app_context():
             print(columns)
 
             # --------------------------------------
-            # ADD completed_date IF MISSING
+            # MIGRATIONS
             # --------------------------------------
 
-            if "completed_date" not in columns:
+            migrations = {
+                "completed_date": "DATE",
+                "order_by": "VARCHAR(100)",
+                "rate": "FLOAT"
+            }
 
-                print(
-                    "completed_date column missing."
-                )
+            for column_name, column_type in migrations.items():
 
-                if db.engine.url.drivername.startswith(
-                    "sqlite"
-                ):
+                if column_name not in columns:
 
-                    db.session.execute(
-                        text(
-                            'ALTER TABLE "order" '
-                            'ADD COLUMN completed_date DATE'
+                    print(
+                        f"{column_name} column missing."
+                    )
+
+                    if db.engine.url.drivername.startswith(
+                        "sqlite"
+                    ):
+
+                        db.session.execute(
+                            text(
+                                f'ALTER TABLE "order" '
+                                f'ADD COLUMN {column_name} '
+                                f'{column_type}'
+                            )
                         )
+
+                    else:
+
+                        db.session.execute(
+                            text(
+                                f'ALTER TABLE "order" '
+                                f'ADD COLUMN IF NOT EXISTS '
+                                f'{column_name} '
+                                f'{column_type}'
+                            )
+                        )
+
+                    db.session.commit()
+
+                    print(
+                        f"{column_name} column added successfully."
                     )
 
                 else:
 
-                    db.session.execute(
-                        text(
-                            'ALTER TABLE "order" '
-                            'ADD COLUMN IF NOT EXISTS '
-                            'completed_date DATE'
-                        )
+                    print(
+                        f"{column_name} column already exists."
                     )
-
-                db.session.commit()
-
-                print(
-                    "completed_date column added successfully."
-                )
-
-            else:
-
-                print(
-                    "completed_date column already exists."
-                )
 
     except Exception as e:
 
@@ -576,11 +595,19 @@ def add_order():
             ),
 
             staff_name=request.form.get(
-                'staff_name'
+            'staff_name'
+            ),
+
+            order_by=request.form.get(
+            'order_by'
+            ),
+
+            rate=float(
+            request.form.get('rate') or 0
             ),
 
             remarks=request.form.get(
-                'remarks'
+            'remarks'
             ),
 
             order_date=order_date_value,
