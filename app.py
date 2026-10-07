@@ -773,7 +773,30 @@ def my_pending_orders():
 # ==================================================
 # DESIGNER - COMPLETED ORDERS
 # ==================================================
+@app.route('/my-job-card-orders')
+def my_job_card_orders():
 
+    if 'user_id' not in session:
+        return redirect('/login')
+
+    if session.get('role') != 'designer':
+        return "Access Denied", 403
+
+    username = session.get('user')
+
+    orders = Order.query.filter(
+        Order.staff_name == username,
+        Order.status == "Job Card"
+    ).order_by(
+        Order.id.desc()
+    ).all()
+
+    return render_template(
+        'my_orders.html',
+        orders=orders,
+        username=username,
+        page_title="My Job Card Orders"
+    )
 @app.route('/my-completed-orders')
 def my_completed_orders():
 

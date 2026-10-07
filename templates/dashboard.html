@@ -26,14 +26,18 @@
 <div class="row g-4 mb-5">
 
 
+    <!-- ================================================= -->
     <!-- MY TOTAL ORDERS -->
+    <!-- ================================================= -->
 
-    <div class="col-md-4">
+    <div class="col-md-3">
 
-        <a href="/my-orders"
-           style="text-decoration:none; color:inherit;">
+        <a
+            href="/my-orders"
+            style="text-decoration:none; color:inherit;"
+        >
 
-            <div class="card dashboard-card">
+            <div class="card dashboard-card clickable-card">
 
                 <div class="card-body">
 
@@ -41,7 +45,9 @@
                         {{ total_orders }}
                     </div>
 
-                    <p>My Total Orders</p>
+                    <p>
+                        My Total Orders
+                    </p>
 
                     <small class="text-muted">
                         Click to view all orders
@@ -56,15 +62,18 @@
     </div>
 
 
+    <!-- ================================================= -->
+    <!-- DESIGN PENDING -->
+    <!-- ================================================= -->
 
-    <!-- PENDING ORDERS -->
+    <div class="col-md-3">
 
-    <div class="col-md-4">
+        <a
+            href="/my-pending-orders"
+            style="text-decoration:none; color:inherit;"
+        >
 
-        <a href="/my-pending-orders"
-           style="text-decoration:none; color:inherit;">
-
-            <div class="card dashboard-card">
+            <div class="card dashboard-card clickable-card">
 
                 <div class="card-body">
 
@@ -72,10 +81,12 @@
                         {{ pending }}
                     </div>
 
-                    <p>Pending Orders</p>
+                    <p>
+                        Design Pending
+                    </p>
 
                     <small class="text-muted">
-                        Click to view pending orders
+                        Orders waiting for design
                     </small>
 
                 </div>
@@ -87,15 +98,54 @@
     </div>
 
 
+    <!-- ================================================= -->
+    <!-- JOB CARD -->
+    <!-- ================================================= -->
 
+    <div class="col-md-3">
+
+        <a
+            href="/my-job-card-orders"
+            style="text-decoration:none; color:inherit;"
+        >
+
+            <div class="card dashboard-card clickable-card">
+
+                <div class="card-body">
+
+                    <div class="card-number card-green">
+                        {{ jobcard|default(0) }}
+                    </div>
+
+                    <p>
+                        Job Card
+                    </p>
+
+                    <small class="text-muted">
+                        Design completed orders
+                    </small>
+
+                </div>
+
+            </div>
+
+        </a>
+
+    </div>
+
+
+    <!-- ================================================= -->
     <!-- COMPLETED ORDERS -->
+    <!-- ================================================= -->
 
-    <div class="col-md-4">
+    <div class="col-md-3">
 
-        <a href="/my-completed-orders"
-           style="text-decoration:none; color:inherit;">
+        <a
+            href="/my-completed-orders"
+            style="text-decoration:none; color:inherit;"
+        >
 
-            <div class="card dashboard-card">
+            <div class="card dashboard-card clickable-card">
 
                 <div class="card-body">
 
@@ -103,10 +153,12 @@
                         {{ completed }}
                     </div>
 
-                    <p>Completed Orders</p>
+                    <p>
+                        Completed Orders
+                    </p>
 
                     <small class="text-muted">
-                        Click to view completed orders
+                        Orders moved ahead
                     </small>
 
                 </div>
@@ -120,7 +172,6 @@
 </div>
 
 
-
 <!-- ===================================================== -->
 <!-- OWNER / MAIN DASHBOARD -->
 <!-- ===================================================== -->
@@ -128,25 +179,28 @@
 {% else %}
 
 
+<!-- ===================================================== -->
 <!-- SEARCH -->
+<!-- ===================================================== -->
 
 <form action="/search" class="mb-4">
 
     <input
         class="form-control search-box"
         name="q"
-        placeholder="🔍 Search Order / Client">
+        placeholder="🔍 Search Order / Client"
+    >
 
 </form>
 
 
-
+<!-- ===================================================== -->
 <!-- OVERVIEW -->
+<!-- ===================================================== -->
 
 <h5 class="mb-3">
     <b>Overview</b>
 </h5>
-
 
 
 <div class="row g-4 mb-5">
@@ -172,7 +226,9 @@
                         {{ total_orders }}
                     </div>
 
-                    <p>Total Orders</p>
+                    <p>
+                        Total Orders
+                    </p>
 
                     <small class="text-muted">
                         Click to view all orders
@@ -185,7 +241,6 @@
         </a>
 
     </div>
-
 
 
     <!-- ================================================= -->
@@ -208,7 +263,9 @@
                         {{ design }}
                     </div>
 
-                    <p>Design</p>
+                    <p>
+                        Design
+                    </p>
 
                     <small class="text-muted">
                         Click to view Design orders
@@ -221,7 +278,6 @@
         </a>
 
     </div>
-
 
 
     <!-- ================================================= -->
@@ -244,7 +300,9 @@
                         {{ jobcard }}
                     </div>
 
-                    <p>Job Card</p>
+                    <p>
+                        Job Card
+                    </p>
 
                     <small class="text-muted">
                         Click to view Job Card orders
@@ -259,7 +317,6 @@
     </div>
 
 </div>
-
 
 
 <!-- ===================================================== -->
@@ -289,7 +346,9 @@
                         {{ printing }}
                     </div>
 
-                    <p>Printing</p>
+                    <p>
+                        Printing
+                    </p>
 
                     <small class="text-muted">
                         Click to view Printing orders
@@ -302,7 +361,6 @@
         </a>
 
     </div>
-
 
 
     <!-- ================================================= -->
@@ -325,7 +383,9 @@
                         {{ packing }}
                     </div>
 
-                    <p>Packing</p>
+                    <p>
+                        Packing
+                    </p>
 
                     <small class="text-muted">
                         Click to view Packing orders
@@ -338,7 +398,6 @@
         </a>
 
     </div>
-
 
 
     <!-- ================================================= -->
@@ -361,7 +420,9 @@
                         {{ dispatched }}
                     </div>
 
-                    <p>Dispatched</p>
+                    <p>
+                        Dispatched
+                    </p>
 
                     <small class="text-muted">
                         Click to view Dispatched orders
@@ -378,7 +439,6 @@
 </div>
 
 
-
 <!-- ===================================================== -->
 <!-- ALL ORDERS -->
 <!-- ===================================================== -->
@@ -388,7 +448,6 @@
     id="ordersSection"
 >
 
-
     <div class="card-header bg-white border-0 pt-4 ps-4">
 
         <h5 id="ordersTitle">
@@ -396,7 +455,6 @@
         </h5>
 
     </div>
-
 
 
     <div class="card-body">
@@ -430,7 +488,6 @@
                     </div>
 
 
-
                     <!-- CLIENT -->
 
                     <div class="col-md-3">
@@ -438,7 +495,6 @@
                         {{ order.client_name }}
 
                     </div>
-
 
 
                     <!-- PRODUCT -->
@@ -450,11 +506,9 @@
                     </div>
 
 
-
                     <!-- STATUS -->
 
                     <div class="col-md-2">
-
 
                         {% if order.status == 'Design' %}
 
@@ -462,6 +516,11 @@
                                 Design
                             </span>
 
+                        {% elif order.status == 'Job Card' %}
+
+                            <span class="status-design">
+                                Job Card
+                            </span>
 
                         {% elif order.status == 'Printing' %}
 
@@ -469,13 +528,11 @@
                                 Printing
                             </span>
 
-
                         {% elif order.status == 'Packing' %}
 
                             <span class="status-packing">
                                 Packing
                             </span>
-
 
                         {% else %}
 
@@ -485,9 +542,7 @@
 
                         {% endif %}
 
-
                     </div>
-
 
 
                     <!-- VIEW -->
@@ -503,7 +558,6 @@
 
                     </div>
 
-
                 </div>
 
             </div>
@@ -514,8 +568,9 @@
         {% endfor %}
 
 
-
+        <!-- ================================================= -->
         <!-- NO ORDERS MESSAGE -->
+        <!-- ================================================= -->
 
         <div
             id="noOrdersMessage"
@@ -527,11 +582,9 @@
 
         </div>
 
-
     </div>
 
 </div>
-
 
 
 <!-- ===================================================== -->
@@ -544,7 +597,6 @@
 >
     +
 </a>
-
 
 
 <!-- ===================================================== -->
@@ -575,7 +627,6 @@ function showOrders(status, title) {
 
     titleElement.innerHTML =
         "📦 " + title;
-
 
 
     /*
@@ -610,7 +661,6 @@ function showOrders(status, title) {
     });
 
 
-
     /*
     ==========================================
     NO ORDERS MESSAGE
@@ -619,16 +669,17 @@ function showOrders(status, title) {
 
     if (visibleCount === 0) {
 
-        noOrdersMessage.style.display = "block";
+        noOrdersMessage.style.display =
+            "block";
 
     }
 
     else {
 
-        noOrdersMessage.style.display = "none";
+        noOrdersMessage.style.display =
+            "none";
 
     }
-
 
 
     /*
@@ -647,7 +698,6 @@ function showOrders(status, title) {
 }
 
 </script>
-
 
 
 <!-- ===================================================== -->
@@ -682,7 +732,6 @@ function showOrders(status, title) {
     transform: translateY(-1px);
 
 }
-
 
 </style>
 
