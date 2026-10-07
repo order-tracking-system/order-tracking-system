@@ -531,22 +531,34 @@ def add_order():
 
         else:
 
-            order_date_value = date.today()
+           order_date_value = date.today()
 
         quantity_value = request.form.get(
             'quantity',
             '0'
         )
 
+        order.staff_name = request.form.get(
+            'staff_name'
+        )
+
+        order.order_by = request.form.get(
+            'order_by'
+        )
+
         try:
 
-            quantity_value = int(
-                quantity_value or 0
+            order.rate = float(
+                request.form.get('rate') or 0
             )
 
         except ValueError:
 
-            quantity_value = 0
+            order.rate = 0
+
+        order.remarks = request.form.get(
+            'remarks'
+        )
 
         order = Order(
 
@@ -665,8 +677,6 @@ def my_orders():
         username=username,
         page_title="My Total Orders"
     )
-
-
 # ==================================================
 # DESIGNER - PENDING ORDERS
 # ==================================================
@@ -675,20 +685,17 @@ def my_orders():
 def my_pending_orders():
 
     if 'user_id' not in session:
-
         return redirect('/login')
 
     if session.get('role') != 'designer':
-
         return "Access Denied", 403
 
-    username = session.get(
-        'user'
-    )
+    username = session.get('user')
 
+    # Designer ke sirf DESIGN status wale orders
     orders = Order.query.filter(
         Order.staff_name == username,
-        Order.status != "Delivered"
+        Order.status == "Design"
     ).order_by(
         Order.id.desc()
     ).all()
@@ -700,7 +707,6 @@ def my_pending_orders():
         page_title="My Pending Orders"
     )
 
-
 # ==================================================
 # DESIGNER - COMPLETED ORDERS
 # ==================================================
@@ -709,20 +715,25 @@ def my_pending_orders():
 def my_completed_orders():
 
     if 'user_id' not in session:
-
         return redirect('/login')
 
     if session.get('role') != 'designer':
-
         return "Access Denied", 403
 
-    username = session.get(
-        'user'
-    )
+    username = session.get('user')
 
+    # Design complete hone ke baad Job Card
+    # se aage ke saare orders Completed me aayenge
     orders = Order.query.filter(
         Order.staff_name == username,
-        Order.status == "Delivered"
+        Order.status.in_([
+            "Job Card",
+            "Printing",
+            "Packing",
+            "Ready Dispatch",
+            "Dispatched",
+            "Delivered"
+        ])
     ).order_by(
         Order.id.desc()
     ).all()
@@ -733,11 +744,6 @@ def my_completed_orders():
         username=username,
         page_title="My Completed Orders"
     )
-
-
-# ==================================================
-# DASHBOARD
-# ==================================================
 # ==================================================
 # DASHBOARD
 # ==================================================
@@ -981,11 +987,25 @@ def edit_order(id):
         )
 
         order.staff_name = request.form.get(
-            'staff_name'
+        'staff_name'
         )
 
+        order.order_by = request.form.get(
+        'order_by'
+        )
+
+        try:
+
+        order.rate = float(
+        request.form.get('rate') or 0
+        )
+
+        except ValueError:
+
+        order.rate = 0
+
         order.remarks = request.form.get(
-            'remarks'
+        'remarks'
         )
 
         if request.form.get('order_date'):
@@ -2048,8 +2068,12 @@ def generate_report_export():
 
         "Size",
 
+        "Rate per piece ",
+
         "Quantity",
 
+        "order by",
+        
         "Designer",
 
         "Order Date",
@@ -2069,30 +2093,34 @@ def generate_report_export():
 
     for order in orders:
 
-        sheet.append([
+       sheet.append([
 
-            order.order_no,
+    order.order_no,
 
-            order.client_name,
+    order.client_name,
 
-            order.mobile,
+    order.mobile,
 
-            order.product,
+    order.product,
 
-            order.size,
+    order.size,
 
-            order.quantity,
+    order.rate,
 
-            order.staff_name,
+    order.quantity,
 
-            order.order_date,
+    order.order_by,
 
-            order.delivery_date,
+    order.staff_name,
 
-            order.status,
+    order.order_date,
 
-            order.remarks
-        ])
+    order.delivery_date,
+
+    order.status,
+
+    order.remarks
+])
 
     # -----------------------------
     # COLUMN WIDTH
