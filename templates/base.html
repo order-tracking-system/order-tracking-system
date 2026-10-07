@@ -81,6 +81,7 @@ PINGAX INDUSTRIES
 </div>
 
 
+
 <!-- DASHBOARD -->
 
 <a
@@ -92,10 +93,12 @@ style="color:white !important;"
 
 
 
+<!-- ============================== -->
 <!-- ADD ORDER -->
-<!-- Hide for Designer -->
+<!-- MAIN / ADMIN ONLY -->
+<!-- ============================== -->
 
-{% if session.get('role') != 'designer' %}
+{% if session.get('role') not in ['designer', 'production'] %}
 
 <a
 href="/add"
@@ -108,10 +111,12 @@ style="color:white !important;"
 
 
 
+<!-- ============================== -->
 <!-- REPORTS -->
-<!-- Hide for Designer -->
+<!-- MAIN / ADMIN ONLY -->
+<!-- ============================== -->
 
-{% if session.get('role') != 'designer' %}
+{% if session.get('role') not in ['designer', 'production'] %}
 
 <a
 href="/reports"
