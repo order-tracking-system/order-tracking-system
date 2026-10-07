@@ -773,6 +773,7 @@ def my_pending_orders():
 # ==================================================
 # DESIGNER - COMPLETED ORDERS
 # ==================================================
+
 @app.route('/my-job-card-orders')
 def my_job_card_orders():
 
@@ -843,15 +844,15 @@ def dashboard():
     role = session.get('role')
     username = session.get('user')
 
+
     # ------------------------------------------
     # PRODUCTION STAFF
-    # Always send production staff to
-    # Production Dashboard
     # ------------------------------------------
 
     if role == 'production':
 
         return redirect('/production-dashboard')
+
 
     # ------------------------------------------
     # OWNER
@@ -863,21 +864,24 @@ def dashboard():
             Order.id.desc()
         ).all()
 
+
     # ------------------------------------------
     # DESIGNER
     # ------------------------------------------
 
     elif role == 'designer':
 
-        orders = Order.query.filter_by(
-            staff_name=username
+        orders = Order.query.filter(
+            Order.staff_name == username
         ).order_by(
             Order.id.desc()
         ).all()
 
+
     else:
 
         orders = []
+
 
     # ------------------------------------------
     # COUNTS
@@ -885,43 +889,84 @@ def dashboard():
 
     total_orders = len(orders)
 
+
+    # DESIGN PENDING
     design = sum(
         1
         for order in orders
         if order.status == "Design"
     )
 
+
+    # JOB CARD
     jobcard = sum(
         1
         for order in orders
         if order.status == "Job Card"
     )
 
+
+    # PRINTING
     printing = sum(
         1
         for order in orders
         if order.status == "Printing"
     )
 
+
+    # PACKING
     packing = sum(
         1
         for order in orders
         if order.status == "Packing"
     )
 
+
+    # READY DISPATCH
+    ready_dispatch = sum(
+        1
+        for order in orders
+        if order.status == "Ready Dispatch"
+    )
+
+
+    # DISPATCHED
     dispatched = sum(
         1
         for order in orders
         if order.status == "Dispatched"
     )
 
-    completed = sum(
+
+    # DELIVERED
+    delivered = sum(
         1
         for order in orders
         if order.status == "Delivered"
     )
 
-    pending = total_orders - completed
+
+    # ------------------------------------------
+    # DESIGNER PENDING
+    # ONLY DESIGN STATUS
+    # ------------------------------------------
+
+    pending = design
+
+
+    # ------------------------------------------
+    # COMPLETED ORDERS
+    # AFTER JOB CARD
+    # ------------------------------------------
+
+    completed = (
+        printing
+        + packing
+        + ready_dispatch
+        + dispatched
+        + delivered
+    )
+
 
     # ------------------------------------------
     # REVENUE
@@ -937,6 +982,7 @@ def dashboard():
     else:
 
         total_revenue = 0
+
 
     # ------------------------------------------
     # DASHBOARD
@@ -958,7 +1004,11 @@ def dashboard():
 
         packing=packing,
 
+        ready_dispatch=ready_dispatch,
+
         dispatched=dispatched,
+
+        delivered=delivered,
 
         completed=completed,
 
@@ -970,36 +1020,6 @@ def dashboard():
 
         username=username
     )
-
-    return render_template(
-
-        'dashboard.html',
-
-        orders=orders,
-
-        total_orders=total_orders,
-
-        design=design,
-
-        jobcard=jobcard,
-
-        printing=printing,
-
-        packing=packing,
-
-        dispatched=dispatched,
-
-        completed=completed,
-
-        pending=pending,
-
-        total_revenue=total_revenue,
-
-        role=role,
-
-        username=username
-    )
-
 
 # ==================================================
 # EDIT ORDER
