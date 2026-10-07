@@ -158,8 +158,8 @@
 
         {% if order.status == 'Design' %}
 
-            <a href="/update/{{ order.id }}/Job Card"
-               class="btn btn-success">
+            <a href="{{ url_for('update_status', id=order.id, status='Job Card') }}"
+            class="btn btn-success">
                 Design Completed
             </a>
 

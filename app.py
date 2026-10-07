@@ -538,28 +538,93 @@ def add_order():
             '0'
         )
 
-        order.staff_name = request.form.get(
-            'staff_name'
-        )
-
-        order.order_by = request.form.get(
-            'order_by'
+        quantity_value = request.form.get(
+            'quantity',
+            '0'
         )
 
         try:
 
-            order.rate = float(
-                request.form.get('rate') or 0
+            quantity_value = int(
+                quantity_value or 0
             )
 
         except ValueError:
 
-            order.rate = 0
+            quantity_value = 0
 
-        order.remarks = request.form.get(
-            'remarks'
+        order = Order(
+
+            order_no=order_no,
+
+            client_name=request.form.get(
+                'client_name'
+            ),
+
+            mobile=request.form.get(
+                'mobile'
+            ),
+
+            product=request.form.get(
+                'product'
+            ),
+
+            size=request.form.get(
+                'size'
+            ),
+
+            quantity=quantity_value,
+
+            inside_process=request.form.get(
+                'inside_process'
+            ),
+
+            inside_gsm=request.form.get(
+                'inside_gsm'
+            ),
+
+            inside_color=request.form.get(
+                'inside_color'
+            ),
+
+            outside_process=request.form.get(
+                'outside_process'
+            ),
+
+            outside_gsm=request.form.get(
+                'outside_gsm'
+            ),
+
+            outside_color=request.form.get(
+                'outside_color'
+            ),
+
+            staff_name=request.form.get(
+                'staff_name'
+            ),
+
+            order_by=request.form.get(
+                'order_by'
+            ),
+
+            rate=float(
+                request.form.get('rate') or 0
+            ),
+
+            remarks=request.form.get(
+                'remarks'
+            ),
+
+            order_date=order_date_value,
+
+            delivery_date=request.form.get(
+                'delivery_date'
+            ),
+
+            status='Design',
+
+            amount=0
         )
-
         order = Order(
 
             order_no=order_no,
@@ -692,7 +757,6 @@ def my_pending_orders():
 
     username = session.get('user')
 
-    # Designer ke sirf DESIGN status wale orders
     orders = Order.query.filter(
         Order.staff_name == username,
         Order.status == "Design"
@@ -706,7 +770,6 @@ def my_pending_orders():
         username=username,
         page_title="My Pending Orders"
     )
-
 # ==================================================
 # DESIGNER - COMPLETED ORDERS
 # ==================================================
@@ -996,13 +1059,13 @@ def edit_order(id):
 
         try:
 
-        order.rate = float(
-        request.form.get('rate') or 0
-        )
+            order.rate = float(
+                request.form.get('rate') or 0
+            )
 
         except ValueError:
 
-        order.rate = 0
+            order.rate = 0
 
         order.remarks = request.form.get(
         'remarks'
@@ -1053,45 +1116,48 @@ def delete_order(id):
 # UPDATE ORDER STATUS
 # ==================================================
 
-@app.route(
-    '/update/<int:id>/<status>'
-)
+@app.route('/update/<int:id>/<path:status>')
 def update_status(id, status):
 
     if 'user_id' not in session:
-
         return redirect('/login')
 
     order = Order.query.get_or_404(id)
 
     role = session.get('role')
-
     username = session.get('user')
+
+    status = status.strip()
 
     if role == 'designer':
 
         if order.staff_name != username:
+            return "Access Denied", 403
 
+        if order.status != "Design":
             return "Access Denied", 403
 
         if status != "Job Card":
-
             return "Access Denied", 403
 
     order.status = status
 
     if status == "Delivered":
 
-        order.completed_date = (
-            datetime.now().date()
-        )
+        order.completed_date = datetime.now().date()
 
     db.session.commit()
+
+    print(
+        "STATUS UPDATED:",
+        order.order_no,
+        "=>",
+        order.status
+    )
 
     return redirect(
         f'/order/{id}'
     )
-
 
 # ==================================================
 # SEARCH
