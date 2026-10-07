@@ -1,9 +1,9 @@
-
 {% extends 'base.html' %}
 
 {% block content %}
 
 <div class="card dashboard-card">
+
     <div class="card-header">
         <h3>New Order</h3>
     </div>
@@ -14,59 +14,87 @@
 
             <div class="row">
 
-                <!-- Client Name -->
+                <!-- ============================== -->
+                <!-- CLIENT NAME -->
+                <!-- ============================== -->
+
                 <div class="col-md-6 mb-3">
+
                     <label>Client Name</label>
-                    <input class="form-control" name="client_name" required>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        name="client_name"
+                        required>
+
                 </div>
 
-                <!-- Mobile -->
+
+                <!-- ============================== -->
+                <!-- CONTACT NUMBER -->
+                <!-- ============================== -->
+
                 <div class="col-md-6 mb-3">
+
                     <label>Contact Number</label>
-                    <input class="form-control" name="mobile">
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        name="mobile">
+
                 </div>
 
-                <!-- Product -->
+
+                <!-- ============================== -->
+                <!-- PRODUCT -->
+                <!-- ============================== -->
+
                 <div class="col-md-6 mb-3">
+
                     <label>Product</label>
-                    <input class="form-control" name="product">
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        name="product">
+
                 </div>
 
-                <!-- Size -->
+
+                <!-- ============================== -->
+                <!-- SIZE -->
+                <!-- ============================== -->
+
                 <div class="col-md-6 mb-3">
+
                     <label>Size</label>
-                    <input class="form-control" name="size">
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        name="size">
+
                 </div>
 
-                <!-- Quantity -->
+
+                <!-- ============================== -->
+                <!-- QUANTITY -->
+                <!-- ============================== -->
+
                 <div class="col-md-12 mb-3">
+
                     <label>Quantity</label>
+
                     <input
                         type="number"
                         class="form-control"
                         name="quantity"
                         min="0">
+
                 </div>
 
-                  <!-- order by -->
-                <div class="col-md-12 mb-3">
-                    <label>order by</label>
-                    <input
-                        type="number"
-                        class="form-control"
-                        name="quantity"
-                        min="0">
-                </div>
-
-                  <!-- order by -->
-                <div class="col-md-12 mb-3">
-                    <label>Rate per piece</label>
-                    <input
-                        type="number"
-                        class="form-control"
-                        name="Rate per piece"
-                        min="0">
-                </div>
 
                 <!-- ============================== -->
                 <!-- INSIDE PRINTING -->
@@ -76,14 +104,20 @@
 
                     <div class="card p-3">
 
-                        <h5 class="mb-3">Inside Printing</h5>
+                        <h5 class="mb-3">
+                            Inside Printing
+                        </h5>
 
-                        <!-- Process Type -->
+
+                        <!-- PROCESS TYPE -->
+
                         <div id="insideProcessContainer">
 
                             <div class="inside-process-row mb-3">
 
-                                <label>Process Type</label>
+                                <label>
+                                    Process Type
+                                </label>
 
                                 <div class="input-group">
 
@@ -91,22 +125,48 @@
                                         class="form-control"
                                         name="inside_process">
 
-                                        <option value="">Select</option>
-                                        <option>UV</option>
-                                        <option>Matte Lamination</option>
-                                        <option>UV+Matte Lamination</option>
-                                        <option>Drip-Off</option>
-                                        <option>Glossy Lamination</option>
-                                        <option>Emboss</option>
-                                        <option>Other</option>
+                                        <option value="">
+                                            Select
+                                        </option>
+
+                                        <option value="UV">
+                                            UV
+                                        </option>
+
+                                        <option value="Matte Lamination">
+                                            Matte Lamination
+                                        </option>
+
+                                        <option value="UV+Matte Lamination">
+                                            UV+Matte Lamination
+                                        </option>
+
+                                        <option value="Drip-Off">
+                                            Drip-Off
+                                        </option>
+
+                                        <option value="Glossy Lamination">
+                                            Glossy Lamination
+                                        </option>
+
+                                        <option value="Emboss">
+                                            Emboss
+                                        </option>
+
+                                        <option value="Other">
+                                            Other
+                                        </option>
 
                                     </select>
+
 
                                     <button
                                         type="button"
                                         class="btn btn-purple"
                                         onclick="addInsideProcess()">
+
                                         +
+
                                     </button>
 
                                 </div>
@@ -115,25 +175,39 @@
 
                         </div>
 
-                        <!-- Paper GSM -->
-                        <label>Paper GSM</label>
+
+                        <!-- PAPER GSM -->
+
+                        <label>
+                            Paper GSM
+                        </label>
 
                         <input
                             type="text"
                             class="form-control"
                             name="inside_gsm">
 
+
                         <br>
 
-                        <!-- Color Type -->
-                        <label>Color Type</label>
+
+                        <!-- COLOR TYPE -->
+
+                        <label>
+                            Color Type
+                        </label>
 
                         <select
                             class="form-control"
                             name="inside_color">
 
-                            <option>Single Color</option>
-                            <option>Multi Color</option>
+                            <option value="Single Color">
+                                Single Color
+                            </option>
+
+                            <option value="Multi Color">
+                                Multi Color
+                            </option>
 
                         </select>
 
@@ -141,13 +215,16 @@
 
                 </div>
 
+
                 <!-- ============================== -->
                 <!-- ASSIGN DESIGNER -->
                 <!-- ============================== -->
 
                 <div class="col-md-6 mb-3">
 
-                    <label>Assign Designer</label>
+                    <label>
+                        Assign Designer
+                    </label>
 
                     <input
                         type="text"
@@ -156,6 +233,7 @@
                         list="designerList"
                         placeholder="Type designer name"
                         required>
+
 
                     <datalist id="designerList">
 
@@ -171,13 +249,16 @@
 
                 </div>
 
+
                 <!-- ============================== -->
                 <!-- ORDER BY -->
                 <!-- ============================== -->
 
                 <div class="col-md-6 mb-3">
 
-                    <label>Order By</label>
+                    <label>
+                        Order By
+                    </label>
 
                     <input
                         type="text"
@@ -187,13 +268,16 @@
 
                 </div>
 
+
                 <!-- ============================== -->
                 <!-- RATE PER PIECE -->
                 <!-- ============================== -->
 
                 <div class="col-md-6 mb-3">
 
-                    <label>Rate / Piece</label>
+                    <label>
+                        Rate / Piece
+                    </label>
 
                     <input
                         type="number"
@@ -205,10 +289,16 @@
 
                 </div>
 
-                <!-- Order Date -->
+
+                <!-- ============================== -->
+                <!-- ORDER DATE -->
+                <!-- ============================== -->
+
                 <div class="col-md-6 mb-3">
 
-                    <label>Order Date</label>
+                    <label>
+                        Order Date
+                    </label>
 
                     <input
                         type="date"
@@ -218,10 +308,16 @@
 
                 </div>
 
-                <!-- Delivery Date -->
+
+                <!-- ============================== -->
+                <!-- DELIVERY DATE -->
+                <!-- ============================== -->
+
                 <div class="col-md-6 mb-3">
 
-                    <label>Delivery Date</label>
+                    <label>
+                        Delivery Date
+                    </label>
 
                     <input
                         type="date"
@@ -230,10 +326,16 @@
 
                 </div>
 
-                <!-- Notes -->
+
+                <!-- ============================== -->
+                <!-- OTHER NOTES -->
+                <!-- ============================== -->
+
                 <div class="col-md-12 mb-3">
 
-                    <label>Other Notes</label>
+                    <label>
+                        Other Notes
+                    </label>
 
                     <textarea
                         class="form-control"
@@ -244,7 +346,11 @@
 
             </div>
 
-            <!-- Save -->
+
+            <!-- ============================== -->
+            <!-- SAVE ORDER -->
+            <!-- ============================== -->
+
             <button
                 type="submit"
                 class="btn btn-purple">
@@ -256,7 +362,9 @@
         </form>
 
     </div>
+
 </div>
+
 
 <!-- ============================== -->
 <!-- JAVASCRIPT -->
@@ -267,7 +375,9 @@
 function addInsideProcess() {
 
     const container =
-        document.getElementById("insideProcessContainer");
+        document.getElementById(
+            "insideProcessContainer"
+        );
 
     const row =
         document.createElement("div");
@@ -277,7 +387,9 @@ function addInsideProcess() {
 
     row.innerHTML = `
 
-        <label>Process Type</label>
+        <label>
+            Process Type
+        </label>
 
         <div class="input-group">
 
@@ -285,16 +397,40 @@ function addInsideProcess() {
                 class="form-control"
                 name="inside_process">
 
-                <option value="">Select</option>
-                <option>UV</option>
-                <option>Matte Lamination</option>
-                <option>UV+Matte Lamination</option>
-                <option>Drip-Off</option>
-                <option>Glossy Lamination</option>
-                <option>Emboss</option>
-                <option>Other</option>
+                <option value="">
+                    Select
+                </option>
+
+                <option value="UV">
+                    UV
+                </option>
+
+                <option value="Matte Lamination">
+                    Matte Lamination
+                </option>
+
+                <option value="UV+Matte Lamination">
+                    UV+Matte Lamination
+                </option>
+
+                <option value="Drip-Off">
+                    Drip-Off
+                </option>
+
+                <option value="Glossy Lamination">
+                    Glossy Lamination
+                </option>
+
+                <option value="Emboss">
+                    Emboss
+                </option>
+
+                <option value="Other">
+                    Other
+                </option>
 
             </select>
+
 
             <button
                 type="button"
@@ -310,6 +446,7 @@ function addInsideProcess() {
     `;
 
     container.appendChild(row);
+
 }
 
 </script>
