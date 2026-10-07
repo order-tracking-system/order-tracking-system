@@ -25,7 +25,9 @@
 
 <div class="row g-4 mb-5">
 
+
     <!-- MY TOTAL ORDERS -->
+
     <div class="col-md-4">
 
         <a href="/my-orders"
@@ -54,7 +56,9 @@
     </div>
 
 
+
     <!-- PENDING ORDERS -->
+
     <div class="col-md-4">
 
         <a href="/my-pending-orders"
@@ -83,7 +87,9 @@
     </div>
 
 
+
     <!-- COMPLETED ORDERS -->
+
     <div class="col-md-4">
 
         <a href="/my-completed-orders"
@@ -113,8 +119,10 @@
 
 </div>
 
+
+
 <!-- ===================================================== -->
-<!-- OWNER DASHBOARD -->
+<!-- OWNER / MAIN DASHBOARD -->
 <!-- ===================================================== -->
 
 {% else %}
@@ -132,6 +140,7 @@
 </form>
 
 
+
 <!-- OVERVIEW -->
 
 <h5 class="mb-3">
@@ -139,68 +148,113 @@
 </h5>
 
 
+
 <div class="row g-4 mb-5">
 
 
+    <!-- ================================================= -->
     <!-- TOTAL ORDERS -->
+    <!-- ================================================= -->
 
     <div class="col-md-4">
 
-        <div class="card dashboard-card">
+        <a
+            href="javascript:void(0)"
+            onclick="showOrders('all', 'All Orders')"
+            style="text-decoration:none; color:inherit;"
+        >
 
-            <div class="card-body">
+            <div class="card dashboard-card clickable-card">
 
-                <div class="card-number card-green">
-                    {{ total_orders }}
+                <div class="card-body">
+
+                    <div class="card-number card-green">
+                        {{ total_orders }}
+                    </div>
+
+                    <p>Total Orders</p>
+
+                    <small class="text-muted">
+                        Click to view all orders
+                    </small>
+
                 </div>
-
-                <p>Total Orders</p>
 
             </div>
 
-        </div>
+        </a>
 
     </div>
 
 
+
+    <!-- ================================================= -->
     <!-- DESIGN -->
+    <!-- ================================================= -->
 
     <div class="col-md-4">
 
-        <div class="card dashboard-card">
+        <a
+            href="javascript:void(0)"
+            onclick="showOrders('Design', 'Design Orders')"
+            style="text-decoration:none; color:inherit;"
+        >
 
-            <div class="card-body">
+            <div class="card dashboard-card clickable-card">
 
-                <div class="card-number card-orange">
-                    {{ design }}
+                <div class="card-body">
+
+                    <div class="card-number card-orange">
+                        {{ design }}
+                    </div>
+
+                    <p>Design</p>
+
+                    <small class="text-muted">
+                        Click to view Design orders
+                    </small>
+
                 </div>
-
-                <p>Design</p>
 
             </div>
 
-        </div>
+        </a>
 
     </div>
 
 
+
+    <!-- ================================================= -->
     <!-- JOB CARD -->
+    <!-- ================================================= -->
 
     <div class="col-md-4">
 
-        <div class="card dashboard-card">
+        <a
+            href="javascript:void(0)"
+            onclick="showOrders('Job Card', 'Job Card Orders')"
+            style="text-decoration:none; color:inherit;"
+        >
 
-            <div class="card-body">
+            <div class="card dashboard-card clickable-card">
 
-                <div class="card-number card-green">
-                    {{ jobcard }}
+                <div class="card-body">
+
+                    <div class="card-number card-green">
+                        {{ jobcard }}
+                    </div>
+
+                    <p>Job Card</p>
+
+                    <small class="text-muted">
+                        Click to view Job Card orders
+                    </small>
+
                 </div>
-
-                <p>Job Card</p>
 
             </div>
 
-        </div>
+        </a>
 
     </div>
 
@@ -215,65 +269,109 @@
 <div class="row g-4 mb-5">
 
 
+    <!-- ================================================= -->
     <!-- PRINTING -->
+    <!-- ================================================= -->
 
     <div class="col-md-4">
 
-        <div class="card dashboard-card">
+        <a
+            href="javascript:void(0)"
+            onclick="showOrders('Printing', 'Printing Orders')"
+            style="text-decoration:none; color:inherit;"
+        >
 
-            <div class="card-body">
+            <div class="card dashboard-card clickable-card">
 
-                <div class="card-number card-blue">
-                    {{ printing }}
+                <div class="card-body">
+
+                    <div class="card-number card-blue">
+                        {{ printing }}
+                    </div>
+
+                    <p>Printing</p>
+
+                    <small class="text-muted">
+                        Click to view Printing orders
+                    </small>
+
                 </div>
-
-                <p>Printing</p>
 
             </div>
 
-        </div>
+        </a>
 
     </div>
 
 
+
+    <!-- ================================================= -->
     <!-- PACKING -->
+    <!-- ================================================= -->
 
     <div class="col-md-4">
 
-        <div class="card dashboard-card">
+        <a
+            href="javascript:void(0)"
+            onclick="showOrders('Packing', 'Packing Orders')"
+            style="text-decoration:none; color:inherit;"
+        >
 
-            <div class="card-body">
+            <div class="card dashboard-card clickable-card">
 
-                <div class="card-number card-orange">
-                    {{ packing }}
+                <div class="card-body">
+
+                    <div class="card-number card-orange">
+                        {{ packing }}
+                    </div>
+
+                    <p>Packing</p>
+
+                    <small class="text-muted">
+                        Click to view Packing orders
+                    </small>
+
                 </div>
-
-                <p>Packing</p>
 
             </div>
 
-        </div>
+        </a>
 
     </div>
 
 
+
+    <!-- ================================================= -->
     <!-- DISPATCHED -->
+    <!-- ================================================= -->
 
     <div class="col-md-4">
 
-        <div class="card dashboard-card">
+        <a
+            href="javascript:void(0)"
+            onclick="showOrders('Dispatched', 'Dispatched Orders')"
+            style="text-decoration:none; color:inherit;"
+        >
 
-            <div class="card-body">
+            <div class="card dashboard-card clickable-card">
 
-                <div class="card-number card-blue">
-                    {{ dispatched }}
+                <div class="card-body">
+
+                    <div class="card-number card-blue">
+                        {{ dispatched }}
+                    </div>
+
+                    <p>Dispatched</p>
+
+                    <small class="text-muted">
+                        Click to view Dispatched orders
+                    </small>
+
                 </div>
-
-                <p>Dispatched</p>
 
             </div>
 
-        </div>
+        </a>
 
     </div>
 
@@ -282,23 +380,39 @@
 
 
 <!-- ===================================================== -->
-<!-- ALL ORDERS FOR OWNER -->
+<!-- ALL ORDERS -->
 <!-- ===================================================== -->
 
-<div class="card dashboard-card">
+<div
+    class="card dashboard-card"
+    id="ordersSection"
+>
+
 
     <div class="card-header bg-white border-0 pt-4 ps-4">
 
-        <h5>📦 All Orders</h5>
+        <h5 id="ordersTitle">
+            📦 All Orders
+        </h5>
 
     </div>
 
 
+
     <div class="card-body">
+
 
         {% for order in orders %}
 
-        <div class="card order-card mb-3">
+
+        <!-- ================================================= -->
+        <!-- ORDER CARD -->
+        <!-- ================================================= -->
+
+        <div
+            class="card order-card mb-3 dashboard-order"
+            data-status="{{ order.status }}"
+        >
 
             <div class="card-body">
 
@@ -316,6 +430,7 @@
                     </div>
 
 
+
                     <!-- CLIENT -->
 
                     <div class="col-md-3">
@@ -323,6 +438,7 @@
                         {{ order.client_name }}
 
                     </div>
+
 
 
                     <!-- PRODUCT -->
@@ -334,9 +450,11 @@
                     </div>
 
 
+
                     <!-- STATUS -->
 
                     <div class="col-md-2">
+
 
                         {% if order.status == 'Design' %}
 
@@ -344,17 +462,20 @@
                                 Design
                             </span>
 
+
                         {% elif order.status == 'Printing' %}
 
                             <span class="status-printing">
                                 Printing
                             </span>
 
+
                         {% elif order.status == 'Packing' %}
 
                             <span class="status-packing">
                                 Packing
                             </span>
+
 
                         {% else %}
 
@@ -364,7 +485,9 @@
 
                         {% endif %}
 
+
                     </div>
+
 
 
                     <!-- VIEW -->
@@ -373,10 +496,9 @@
 
                         <a
                             href="/order/{{ order.id }}"
-                            class="btn btn-purple">
-
+                            class="btn btn-purple"
+                        >
                             View
-
                         </a>
 
                     </div>
@@ -388,7 +510,23 @@
 
         </div>
 
+
         {% endfor %}
+
+
+
+        <!-- NO ORDERS MESSAGE -->
+
+        <div
+            id="noOrdersMessage"
+            class="text-center text-muted py-4"
+            style="display:none;"
+        >
+
+            No orders found for this category.
+
+        </div>
+
 
     </div>
 
@@ -396,11 +534,157 @@
 
 
 
+<!-- ===================================================== -->
 <!-- QUICK ADD ORDER -->
+<!-- ===================================================== -->
 
-<a href="/add" class="quick-action">
+<a
+    href="/add"
+    class="quick-action"
+>
     +
 </a>
+
+
+
+<!-- ===================================================== -->
+<!-- JAVASCRIPT -->
+<!-- ===================================================== -->
+
+<script>
+
+function showOrders(status, title) {
+
+    const orders =
+        document.querySelectorAll(".dashboard-order");
+
+    const titleElement =
+        document.getElementById("ordersTitle");
+
+    const noOrdersMessage =
+        document.getElementById("noOrdersMessage");
+
+    let visibleCount = 0;
+
+
+    /*
+    ==========================================
+    CHANGE SECTION TITLE
+    ==========================================
+    */
+
+    titleElement.innerHTML =
+        "📦 " + title;
+
+
+
+    /*
+    ==========================================
+    FILTER ORDERS
+    ==========================================
+    */
+
+    orders.forEach(function(order) {
+
+        const orderStatus =
+            order.getAttribute("data-status");
+
+
+        if (
+            status === "all" ||
+            orderStatus === status
+        ) {
+
+            order.style.display = "";
+
+            visibleCount++;
+
+        }
+
+        else {
+
+            order.style.display = "none";
+
+        }
+
+    });
+
+
+
+    /*
+    ==========================================
+    NO ORDERS MESSAGE
+    ==========================================
+    */
+
+    if (visibleCount === 0) {
+
+        noOrdersMessage.style.display = "block";
+
+    }
+
+    else {
+
+        noOrdersMessage.style.display = "none";
+
+    }
+
+
+
+    /*
+    ==========================================
+    SCROLL TO ORDERS
+    ==========================================
+    */
+
+    document
+        .getElementById("ordersSection")
+        .scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+
+}
+
+</script>
+
+
+
+<!-- ===================================================== -->
+<!-- CARD HOVER STYLE -->
+<!-- ===================================================== -->
+
+<style>
+
+.clickable-card {
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+
+}
+
+
+.clickable-card:hover {
+
+    transform: translateY(-4px);
+
+    box-shadow:
+        0 8px 20px rgba(0,0,0,0.12);
+
+}
+
+
+.clickable-card:active {
+
+    transform: translateY(-1px);
+
+}
+
+
+</style>
 
 
 {% endif %}
