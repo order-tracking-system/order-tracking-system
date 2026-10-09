@@ -2417,7 +2417,7 @@ with app.app_context():
         designer1 = User(
             name="Latif Makwana",
             username="designer1",
-            password="designer@123",
+            password="latif@123",
             role="designer"
         )
         db.session.add(designer1)
@@ -2433,7 +2433,7 @@ with app.app_context():
         designer2 = User(
             name="Dolly Kesharwani",
             username="designer2",
-            password="designer2@123",
+            password="dolly@123",
             role="designer"
         )
         db.session.add(designer2)
@@ -2448,8 +2448,8 @@ with app.app_context():
     if not designer3:
         designer3 = User(
             name="Anu Gaynar",
-            username="designer3",
-            password="designer3@123",
+            username="Anu Gaynar",
+            password="anu@123",
             role="designer"
         )
         db.session.add(designer3)
