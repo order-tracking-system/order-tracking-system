@@ -844,6 +844,13 @@ def dashboard():
     role = session.get('role')
     username = session.get('user')
 
+    # Friendly name shown in the dashboard greeting.
+    designer_names = {
+        'designer1': 'Latif Makwana',
+        'designer2': 'Dolly Kesharwani',
+        'designer3': 'Anu Gaynar'
+    }
+    display_name = designer_names.get(username, username)
 
     # ------------------------------------------
     # PRODUCTION STAFF
@@ -1018,7 +1025,9 @@ def dashboard():
 
         role=role,
 
-        username=username
+        username=username,
+
+        display_name=display_name
     )
 
 # ==================================================
@@ -2397,71 +2406,55 @@ with app.app_context():
 
         db.session.commit()
 
-    # DESIGNER 1
+    # DESIGNER 1 - LATIF MAKWANA
     designer1 = User.query.filter_by(
         username="designer1"
     ).first()
 
     if not designer1:
-
         designer1 = User(
-
-            name="Designer One",
-
+            name="Latif Makwana",
             username="designer1",
-
             password="designer@123",
-
             role="designer"
         )
-
         db.session.add(designer1)
+    else:
+        designer1.name = "Latif Makwana"
 
-        db.session.commit()
-
-    # DESIGNER 2
+    # DESIGNER 2 - DOLLY KESHWARWANI
     designer2 = User.query.filter_by(
         username="designer2"
     ).first()
 
     if not designer2:
-
         designer2 = User(
-
-            name="Designer Two",
-
+            name="Dolly Kesharwani",
             username="designer2",
-
             password="designer2@123",
-
             role="designer"
         )
-
         db.session.add(designer2)
+    else:
+        designer2.name = "Dolly Kesharwani"
 
-        db.session.commit()
-
-    # DESIGNER 3
+    # DESIGNER 3 - ANU GAYNAR
     designer3 = User.query.filter_by(
         username="designer3"
     ).first()
 
     if not designer3:
-
         designer3 = User(
-
-            name="Designer Three",
-
+            name="Anu Gaynar",
             username="designer3",
-
             password="designer3@123",
-
             role="designer"
         )
-
         db.session.add(designer3)
+    else:
+        designer3.name = "Anu Gaynar"
 
-        db.session.commit()
+    db.session.commit()
 
     # PRODUCTION
     production1 = User.query.filter_by(
