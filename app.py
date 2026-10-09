@@ -843,6 +843,7 @@ def dashboard():
 
     role = session.get('role')
     username = session.get('user')
+    
 
     # Friendly name shown in the dashboard greeting.
     designer_names = {
@@ -1027,7 +1028,8 @@ def dashboard():
 
         username=username,
 
-        display_name=display_name
+        display_name=display_name,
+
     )
 
 # ==================================================
