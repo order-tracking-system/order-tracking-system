@@ -1645,8 +1645,14 @@ def reports():
         if order.status == "Ready Dispatch"
     )
 
+    dispatched = sum(
+        1
+        for order in orders
+        if order.status == "Dispatched"
+    )
+
     complete_ready = (
-        delivered + ready_dispatch
+        delivered + ready_dispatch + dispatched
     )
 
     design = sum(
@@ -1869,7 +1875,8 @@ def report_orders():
             for order in orders
             if order.status in [
                 "Delivered",
-                "Ready Dispatch"
+                "Ready Dispatch",
+                "Dispatched"
             ]
         ]
 
@@ -2102,7 +2109,8 @@ def generate_report_export():
         query = query.filter(
             Order.status.in_([
                 "Delivered",
-                "Ready Dispatch"
+                "Ready Dispatch",
+                "Dispatched"
             ])
         )
 
