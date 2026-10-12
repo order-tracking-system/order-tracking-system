@@ -1,48 +1,91 @@
+```html
 {% extends 'base.html' %}
 
 {% block content %}
 
 <div class="card dashboard-card">
 
-<div class="card-body">
+    <div class="card-header">
+        <h3 class="mb-0">🚚 Dispatch Entry</h3>
+    </div>
 
-<h3>
-Dispatch Entry
-</h3>
+    <div class="card-body">
 
-<form method="POST">
+        <form method="POST"
+              action="{{ url_for('dispatch', id=order.id) }}">
 
-<input
-class="form-control mb-3"
-name="transport_name"
-placeholder="Transport Name">
+            <div class="mb-3">
+                <label class="form-label">
+                    Transport Name
+                </label>
 
-<input
-class="form-control mb-3"
-name="lr_number"
-placeholder="LR Number">
+                <input
+                    type="text"
+                    class="form-control"
+                    name="transport_name"
+                    placeholder="Enter Transport Name"
+                    value="{{ order.transport_name or '' }}"
+                >
+            </div>
 
-<input
-class="form-control mb-3"
-name="invoice_number"
-placeholder="Invoice Number">
+            <div class="mb-3">
+                <label class="form-label">
+                    LR Number
+                </label>
 
-<input
-type="date"
-class="form-control mb-3"
-name="dispatch_date">
+                <input
+                    type="text"
+                    class="form-control"
+                    name="lr_number"
+                    placeholder="Enter LR Number"
+                    value="{{ order.lr_number or '' }}"
+                >
+            </div>
 
-<button
-class="btn btn-purple">
+            <div class="mb-3">
+                <label class="form-label">
+                    Invoice Number
+                </label>
 
-Save Dispatch
+                <input
+                    type="text"
+                    class="form-control"
+                    name="invoice_number"
+                    placeholder="Enter Invoice Number"
+                    value="{{ order.invoice_number or '' }}"
+                >
+            </div>
 
-</button>
+            <div class="mb-3">
+                <label class="form-label">
+                    Dispatch Date
+                </label>
 
-</form>
+                <input
+                    type="date"
+                    class="form-control"
+                    name="dispatch_date"
+                    value="{{ order.dispatch_date or '' }}"
+                >
+            </div>
 
-</div>
+            <button
+                type="submit"
+                class="btn btn-purple">
+                Save Dispatch
+            </button>
+
+            <a
+                href="{{ url_for('order_detail', id=order.id) }}"
+                class="btn btn-secondary">
+                Cancel
+            </a>
+
+        </form>
+
+    </div>
 
 </div>
 
 {% endblock %}
+```

@@ -129,7 +129,56 @@
 
 <br>
 
+```html
+<!-- ================= DISPATCH DETAILS ================= -->
 
+{% if order.status in ['Dispatched', 'Delivered'] or order.transport_name or order.lr_number or order.invoice_number or order.dispatch_date %}
+
+<div class="card dashboard-card mt-3">
+
+    <div class="card-header">
+        <b>🚚 Dispatch Details</b>
+    </div>
+
+    <div class="card-body">
+
+        <div class="row">
+
+            <div class="col-md-6">
+
+                <p>
+                    <b>Transport Name:</b>
+                    {{ order.transport_name or 'Not entered' }}
+                </p>
+
+                <p>
+                    <b>LR Number:</b>
+                    {{ order.lr_number or 'Not entered' }}
+                </p>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <p>
+                    <b>Invoice Number:</b>
+                    {{ order.invoice_number or 'Not entered' }}
+                </p>
+
+                <p>
+                    <b>Dispatch Date:</b>
+                    {{ order.dispatch_date or 'Not entered' }}
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endif %}
 <!-- ================================================= -->
 <!--                 DESIGNER VIEW                    -->
 <!-- ================================================= -->
