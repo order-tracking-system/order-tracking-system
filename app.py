@@ -1030,6 +1030,7 @@ def dashboard():
 
         display_name=display_name,
 
+        
     )
 
 # ==================================================
@@ -2417,7 +2418,7 @@ with app.app_context():
         designer1 = User(
             name="Latif Makwana",
             username="designer1",
-            password="latif@123",
+            password="designer@123",
             role="designer"
         )
         db.session.add(designer1)
@@ -2433,7 +2434,7 @@ with app.app_context():
         designer2 = User(
             name="Dolly Kesharwani",
             username="designer2",
-            password="dolly@123",
+            password="designer2@123",
             role="designer"
         )
         db.session.add(designer2)
@@ -2448,8 +2449,8 @@ with app.app_context():
     if not designer3:
         designer3 = User(
             name="Anu Gaynar",
-            username="Anu Gaynar",
-            password="anu@123",
+            username="designer3",
+            password="designer3@123",
             role="designer"
         )
         db.session.add(designer3)
